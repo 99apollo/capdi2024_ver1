@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "342491110365",
+    "project_id": "capdi2024-ver1",
+    "storage_bucket": "capdi2024-ver1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342491110365:android:dd502666fdda269261f434",
+        "android_client_info": {
+          "package_name": "com.example.capdi2024_ver1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqEPetpvC9eu-4uM32I3wqP5o8qNGlWNo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
