@@ -45,29 +45,11 @@ public class MainActivity extends AppCompatActivity {
         loginbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CharSequence idin = idtext.getText().toString();
-                CharSequence pwin = passtext.getText().toString();
-                Map<String, Object> user = new HashMap<>();
-                user.put("id", idin);
-                user.put("password", pwin);
+                String id = idtext.getText().toString();
+                String password = passtext.getText().toString();
 
-                // Log를 사용하여 값이 올바르게 설정되었는지 확인
-                Log.d(TAG, "idin: " + idin);
-                Log.d(TAG, "pwin: " + pwin);
-
-                if (idin.length() == 0 || pwin.length() == 0) {
-                    makeText(getApplicationContext(), "입력해주세요.", Toast.LENGTH_LONG).show();
-                } else {
-                    myRef.child("user").setValue(user).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // 실패 시 처리
-                            Log.e(TAG, "Error adding document", e);
-                        }
-                    });
-                    Intent intent = new Intent(MainActivity.this, ClientMainPage.class);
-                    startActivity(intent);
-                }
+                // LoginActivity를 통해 로그인 시도
+                LoginActivity.attemptLogin(MainActivity.this, id, password);
             }
         });
 
