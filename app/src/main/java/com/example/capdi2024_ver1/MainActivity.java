@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     Intent intent = new Intent(MainActivity.this, ClientMainPage.class);
+                    intent.putExtra("userid",idin);
                     startActivity(intent);
                 }
             }
