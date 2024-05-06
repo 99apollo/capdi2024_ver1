@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button signUpButton = findViewById(R.id.sign_up_button);
         Button loginbutton = findViewById(R.id.login_button);
         TextView idtext = findViewById(R.id.id_input_text);
         EditText passtext = findViewById(R.id.password_input_text);
@@ -67,6 +68,15 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, ClientMainPage.class);
                     startActivity(intent);
                 }
+            }
+        });
+
+        //회원가입
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
+                startActivity(intent);
             }
         });
     }
