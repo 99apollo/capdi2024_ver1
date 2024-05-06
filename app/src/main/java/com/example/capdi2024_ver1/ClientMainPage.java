@@ -40,7 +40,7 @@ public class ClientMainPage extends AppCompatActivity {
 
         // Intent로부터 데이터 받기
         Intent intent = getIntent();
-        String userId = intent.getStringExtra("userid");
+        String userId = intent.getStringExtra("userId");
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);  // `SharedViewModel` 가져오기
         sharedViewModel.setUserId(userId);
         // 이 데이터를 Fragment에 전달하는 방법 중 하나는 NavController를 통해 Bundle로 전달하는 것입니다.

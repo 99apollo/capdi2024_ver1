@@ -1,7 +1,10 @@
 package com.example.capdi2024_ver1;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -29,7 +32,10 @@ public class LoginActivity {
 
                 if (loggedIn) {
                     // 로그인 성공 시 처리
+
+                    Log.d(TAG, "idin: " + id);
                     Intent intent = new Intent(context, ClientMainPage.class);
+                    intent.putExtra("userId",id);
                     context.startActivity(intent);
                 } else {
                     // 로그인 실패 시 처리
