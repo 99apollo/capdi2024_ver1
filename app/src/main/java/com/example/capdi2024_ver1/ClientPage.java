@@ -25,7 +25,7 @@ public class ClientPage extends AppCompatActivity {
         setContentView(R.layout.activity_client_page);
 
         // HTTP 요청을 보낼 URL
-        String url = "http://3.35.9.191/test.php";
+        String url = "http://3.35.9.191/connect.php?username=app&password=app2024";
 
         // Volley 요청 큐 생성
         RequestQueue queue = Volley.newRequestQueue(this);

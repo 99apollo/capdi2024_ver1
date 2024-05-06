@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.e(TAG, "Error adding document", e);
                         }
                     });
-                    Intent intent = new Intent(MainActivity.this, ClientPage.class);
+                    Intent intent = new Intent(MainActivity.this, ClientMainPage.class);
                     startActivity(intent);
                 }
             }
