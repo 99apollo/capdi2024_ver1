@@ -28,7 +28,7 @@
     <fragment
         android:id="@+id/nav_host_fragment_activity_client_main_page"
         android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="413dp"
+        android:layout_width="match_parent"
         android:layout_height="590dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@+id/nav_view"

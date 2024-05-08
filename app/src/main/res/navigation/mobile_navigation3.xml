@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation3"
+    app:startDestination="@+id/navigation_admin_home">
+
+    <fragment
+        android:id="@+id/navigation_admin_home"
+        android:name="com.example.capdi2024_ver1.admin_ui.home.AdminHomeFragment"
+        android:label="@string/title_admin_home"
+        tools:layout="@layout/fragment_admin_home" />
+
+    <fragment
+        android:id="@+id/navigation_admin_dashboard"
+        android:name="com.example.capdi2024_ver1.admin_ui.dashboard.AdminDashboardFragment"
+        android:label="@string/title_admin_dashboard"
+        tools:layout="@layout/fragment_admin_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_admin_notifications"
+        android:name="com.example.capdi2024_ver1.admin_ui.notifications.AdminNotificationsFragment"
+        android:label="@string/title_admin_notifications"
+        tools:layout="@layout/fragment_admin_notifications" />
+</navigation>

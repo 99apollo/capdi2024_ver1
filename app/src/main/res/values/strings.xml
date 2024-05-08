@@ -47,5 +47,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">CartConnet</string>
     <string name="title_notifications">MyInfo</string>
-    <string name="title_connet">CartConnet</string>
+    <string name="title_admin_home">Home</string>
+    <string name="title_admin_dashboard">Item Dashboard</string>
+    <string name="title_admin_notifications">Admin Info</string>
+    <string name="title_activity_admin_main_page">AdminMainPage</string>
 </resources>

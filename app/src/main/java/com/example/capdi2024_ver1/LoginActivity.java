@@ -26,20 +26,27 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Intent intent = new Intent(context, ClientMainPage.class);
                 boolean loggedIn = false;
+                boolean rootcheck = false;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null && user.getEmail().equals(id) && user.getPassword().equals(password)) {
                         loggedIn = true;
                         intent.putExtra("userId",user.getUsername());
-
+                        if(user.getUsername().equals("root")){
+                            rootcheck = true;
+                        }
                         Log.d(TAG, "username : " + user.getUsername());
                         break;
                     }
                 }
-
                 if (loggedIn) {
                     // 로그인 성공 시 처리
-                    context.startActivity(intent);
+                    if(rootcheck){
+                        Intent intent2=new Intent(context, AdminMainPage.class);
+                        context.startActivity(intent2);
+                    }else {
+                        context.startActivity(intent);
+                    }
                 } else {
                     // 로그인 실패 시 처리
                     Toast.makeText(context, "아이디 또는 비밀번호가 올바르지 않습니다.", Toast.LENGTH_LONG).show();
