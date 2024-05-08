@@ -7,13 +7,16 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class LoginActivity {
+public class LoginActivity extends AppCompatActivity {
+    private String username;
 
     public static void attemptLogin(Context context, String id, String password) {
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
@@ -21,21 +24,21 @@ public class LoginActivity {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Intent intent = new Intent(context, ClientMainPage.class);
                 boolean loggedIn = false;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null && user.getEmail().equals(id) && user.getPassword().equals(password)) {
                         loggedIn = true;
+                        intent.putExtra("userId",user.getUsername());
+
+                        Log.d(TAG, "username : " + user.getUsername());
                         break;
                     }
                 }
 
                 if (loggedIn) {
                     // 로그인 성공 시 처리
-
-                    Log.d(TAG, "idin: " + id);
-                    Intent intent = new Intent(context, ClientMainPage.class);
-                    intent.putExtra("userId",id);
                     context.startActivity(intent);
                 } else {
                     // 로그인 실패 시 처리
@@ -50,5 +53,6 @@ public class LoginActivity {
             }
         });
     }
+
 
 }
