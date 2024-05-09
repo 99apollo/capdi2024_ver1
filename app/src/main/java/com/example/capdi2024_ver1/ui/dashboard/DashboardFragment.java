@@ -254,26 +254,35 @@ public class DashboardFragment extends Fragment {
     }
 
     private void sendHttpRequest(String cartID) {
+        // Fragment가 Activity에 연결된 상태인지 확인
+        if (!isAdded()) {
+            Log.w(TAG, "Fragment not attached to context. Aborting request.");
+            return;
+        }
+
         // `RequestQueue`가 `null`인지 확인하고, `null`일 경우 초기화
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(requireContext());
         }
-        String url = "http://3.35.9.191/connect.php?username=app&password=app2024";  // 요청할 URL
+
+        // 요청할 URL
+        String url = "http://3.35.9.191/connect.php?username=app&password=app2024";
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        List<CartItem> cartItems = parseJson(response,cartID);
-                        adapter = new CartItemAdapter(cartItems);  // Adapter 업데이트
-                        recyclerView.setAdapter(adapter);  // RecyclerView에 Adapter 설정
+                        List<CartItem> cartItems = parseJson(response, cartID);
+                        adapter = new CartItemAdapter(cartItems);
+                        recyclerView.setAdapter(adapter);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // 에러 처리
-            }
-        });
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 에러 처리
+                    }
+                });
 
         requestQueue.add(stringRequest);
     }
