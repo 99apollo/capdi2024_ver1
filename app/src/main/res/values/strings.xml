@@ -51,4 +51,5 @@
     <string name="title_admin_dashboard">Item Dashboard</string>
     <string name="title_admin_notifications">Admin Info</string>
     <string name="title_activity_admin_main_page">AdminMainPage</string>
+    <string name="title_activity_main2">MainActivity2</string>
 </resources>

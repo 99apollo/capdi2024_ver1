@@ -42,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="결제내역"
+                android:id="@+id/item_buy_list"
                 />
 
             <TextView

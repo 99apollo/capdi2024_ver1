@@ -49,6 +49,7 @@ public class DashboardFragment extends Fragment {
     private RecyclerView recyclerView;
     private CartItemAdapter adapter;
     private DatabaseReference cartListRef;
+    private DatabaseReference cartListCheckRef;
     private RequestQueue requestQueue;
     private String userId;  // 전달받은 userId를 저장할 필드
     private SharedViewModel sharedViewModel;
@@ -63,6 +64,7 @@ public class DashboardFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
+        cartListCheckRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         Button disconnet_Button = requireActivity().findViewById(R.id.disconnect_button);
         disconnet_Button.setVisibility(View.VISIBLE);
@@ -138,8 +140,14 @@ public class DashboardFragment extends Fragment {
                             cartListRef.child(userId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
-                                    Toast.makeText(requireActivity(), "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
-
+                                    cartListCheckRef.child(cartId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Toast.makeText(requireActivity(), "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
+                                            Button disconnet = requireActivity().findViewById(R.id.disconnect_button);
+                                            disconnet.setText("connect");
+                                        }
+                                    });
 
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
@@ -212,8 +220,24 @@ public class DashboardFragment extends Fragment {
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             String cartId = input.getText().toString();
-            cartListRef.child(userId).child("cart_id").setValue(cartId);
-            loadCartItems(cartId);
+            cartListCheckRef.child(cartId).get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    DataSnapshot dataSnapshot = task.getResult();
+                    if (dataSnapshot.exists()) {
+                        // cart 사용자 존재시
+                        Toast.makeText(requireActivity(), "해당 카트는 사용자가 존재합니다.", Toast.LENGTH_LONG).show();
+
+                    } else {
+                        // cart 사용자 없을시
+                        cartListRef.child(userId).child("cart_id").setValue(cartId);
+                        cartListCheckRef.child(cartId).setValue(userId);
+                        Button button1 = requireActivity().findViewById(R.id.disconnect_button);
+                        button1.setText("disconnet");
+                        loadCartItems(cartId);
+
+                    }
+                }
+            });
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> {

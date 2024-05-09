@@ -1,8 +1,16 @@
 package com.example.capdi2024_ver1.ui.notifications;
 
+import static android.content.ContentValues.TAG;
+
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.capdi2024_ver1.SharedViewModel;
 
 public class NotificationsViewModel extends ViewModel {
 
