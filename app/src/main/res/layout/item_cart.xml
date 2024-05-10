@@ -2,49 +2,57 @@
 <!-- item_cart.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="?attr/selectableItemBackground"
+    android:divider="?android:attr/dividerHorizontal"
+    android:showDividers="middle">
 
-    >
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="3">
-
-        <ImageView
-            android:id="@+id/item_Image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/item_Image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="8dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Item Image"
+        android:background="#E0E0E0" />
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical">
+
         <TextView
             android:id="@+id/cart_id"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cart ID"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:paddingTop="4dp" />
 
         <TextView
             android:id="@+id/item_id"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Item ID"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:paddingTop="4dp" />
 
         <TextView
             android:id="@+id/item_value"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Item Value"
-            android:textSize="16sp" />
-
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:paddingTop="4dp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -287,23 +288,39 @@ public class DashboardFragment extends Fragment {
         requestQueue.add(stringRequest);
     }
 
-    private List<CartItem> parseJson(String json,String inCartId) {
+    private List<CartItem> parseJson(String json, String inCartId) {
         List<CartItem> cartItems = new ArrayList<>();
+        if (!isAdded()) {
+            Log.w(TAG, "Fragment not attached to context. Aborting request.");
+            return cartItems;
+        }
+
+        int temp = 0;
         try {
             JSONArray jsonArray = new JSONArray(json);
+            temp = jsonArray.length();
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 String cartId = jsonObject.getString("cartid");
                 String itemId = jsonObject.getString("item_id");
                 String itemValue = jsonObject.getString("item_value");
-                if(cartId.equals(inCartId)){
+
+                if (cartId.equals(inCartId)) {
                     CartItem cartItem = new CartItem(cartId, itemId, itemValue);
                     cartItems.add(cartItem);
                 }
             }
+
+            if (isAdded()) { // Fragment가 Activity에 연결되었는지 확인
+                TextView listCount = requireActivity().findViewById(R.id.list_count_input);
+                listCount.setText(String.valueOf(temp)); // 문자열로 변환
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         return cartItems;
     }
+
 }
