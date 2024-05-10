@@ -5,6 +5,8 @@ import static android.content.ContentValues.TAG;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +56,8 @@ public class DashboardFragment extends Fragment {
     private RequestQueue requestQueue;
     private String userId;  // 전달받은 userId를 저장할 필드
     private SharedViewModel sharedViewModel;
+    private Handler handler;
+    private Runnable fetchRunnable;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -61,6 +65,8 @@ public class DashboardFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
+        // 초기화
+        handler = new Handler(Looper.getMainLooper());
         recyclerView = root.findViewById(R.id.cart_item_listview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -107,6 +113,34 @@ public class DashboardFragment extends Fragment {
         });
         return root;
     }
+    private void startPeriodicFetching(String cartID) {
+        if (handler == null) {
+            handler = new Handler(Looper.getMainLooper()); // `Handler` 초기화
+        }
+
+        stopPeriodicFetching(); // 이미 실행 중인 주기적 작업 중단
+
+        fetchRunnable = new Runnable() {
+            @Override
+            public void run() {
+                sendHttpRequest(cartID); // HTTP 요청 수행
+                handler.postDelayed(this, 10000); // 10초 후에 다시 실행
+                Log.e(TAG,"test"+cartID);
+            }
+        };
+
+        if (handler != null) { // `Handler`가 유효한지 확인
+            handler.post(fetchRunnable); // 최초 실행
+        }
+    }
+
+    private void stopPeriodicFetching() {
+        if (fetchRunnable != null && handler != null) {
+            handler.removeCallbacks(fetchRunnable); // 주기적 작업 중단
+        }
+    }
+
+
     private void checkCartID(String userId,Button button) {
         Log.d(TAG, "id in requset: " + userId);
         cartListRef.child(userId).get().addOnCompleteListener(task -> {
@@ -146,6 +180,7 @@ public class DashboardFragment extends Fragment {
                                         public void onSuccess(Void unused) {
                                             Toast.makeText(requireActivity(), "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
                                             Button disconnet = requireActivity().findViewById(R.id.disconnect_button);
+                                            stopPeriodicFetching();
                                             disconnet.setText("connect");
                                         }
                                     });
@@ -251,7 +286,7 @@ public class DashboardFragment extends Fragment {
     private void loadCartItems(String cartId) {
         // cart_id를 사용하여 데이터를 가져옵니다.
         // 기존의 Volley를 사용한 코드와 통합
-        sendHttpRequest(cartId);
+        startPeriodicFetching(cartId);
     }
 
     private void sendHttpRequest(String cartID) {
@@ -298,7 +333,7 @@ public class DashboardFragment extends Fragment {
         int temp = 0;
         try {
             JSONArray jsonArray = new JSONArray(json);
-            temp = jsonArray.length();
+
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -309,6 +344,7 @@ public class DashboardFragment extends Fragment {
                 if (cartId.equals(inCartId)) {
                     CartItem cartItem = new CartItem(cartId, itemId, itemValue);
                     cartItems.add(cartItem);
+                    temp++;
                 }
             }
 
@@ -321,6 +357,17 @@ public class DashboardFragment extends Fragment {
         }
 
         return cartItems;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopPeriodicFetching(); // `Fragment`가 일시정지 상태로 갈 때 주기적 작업 중단
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopPeriodicFetching(); // `Fragment`가 파괴될 때 주기적 작업 중단
     }
 
 }
