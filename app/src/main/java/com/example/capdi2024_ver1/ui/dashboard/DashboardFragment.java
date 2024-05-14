@@ -163,7 +163,7 @@ public class DashboardFragment extends Fragment {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(requireContext());
         }
-        String url = "http://3.35.9.191/connect.php?username=app&password=app2024";  // 요청할 URL
+        String url = "http://3.35.9.191/test2.php?username=app&password=app2024&cart_id="+cartId;  // 요청할 URL
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -302,7 +302,7 @@ public class DashboardFragment extends Fragment {
         }
 
         // 요청할 URL
-        String url = "http://3.35.9.191/connect.php?username=app&password=app2024";
+        String url = "http://3.35.9.191/test2.php?username=app&password=app2024&cart_id="+cartID;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -337,12 +337,14 @@ public class DashboardFragment extends Fragment {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String cartId = jsonObject.getString("cartid");
-                String itemId = jsonObject.getString("item_id");
+                String cartId = jsonObject.getString("cart_id");
+                String itemId = jsonObject.getString("name");
                 String itemValue = jsonObject.getString("item_value");
-
+                String count = jsonObject.getString("count");
+                Log.e(TAG,"name confirm : "+itemId);
                 if (cartId.equals(inCartId)) {
-                    CartItem cartItem = new CartItem(cartId, itemId, itemValue);
+                    CartItem cartItem = new CartItem(cartId, itemId, itemValue,count);
+
                     cartItems.add(cartItem);
                     temp++;
                 }

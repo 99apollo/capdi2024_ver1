@@ -4,11 +4,13 @@ public class CartItem {
     private String cartId;
     private String itemId;
     private String itemValue;
+    private String count;
 
-    public CartItem(String cartId, String itemId, String itemValue) {
+    public CartItem(String cartId, String itemId, String itemValue, String count) {
         this.cartId = cartId;
         this.itemId = itemId;
         this.itemValue = itemValue;
+        this.count = count;
     }
 
     public String getCartId() {
@@ -22,4 +24,5 @@ public class CartItem {
     public String getItemValue() {
         return itemValue;
     }
+    public String getCount(){return count;}
 }

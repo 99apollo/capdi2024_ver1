@@ -34,6 +34,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         holder.cartIdTextView.setText("Cart ID: " + cartItem.getCartId());
         holder.itemIdTextView.setText("Item ID: " + cartItem.getItemId());
         holder.itemValueTextView.setText("Item Value: " + cartItem.getItemValue());
+        holder.itemCountTextView.setText("count: "+cartItem.getCount());
     }
 
     @Override
@@ -45,12 +46,14 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         TextView cartIdTextView;
         TextView itemIdTextView;
         TextView itemValueTextView;
+        TextView itemCountTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             cartIdTextView = itemView.findViewById(R.id.cart_id);
             itemIdTextView = itemView.findViewById(R.id.item_id);
             itemValueTextView = itemView.findViewById(R.id.item_value);
+            itemCountTextView = itemView.findViewById(R.id.item_count);
         }
     }
 }
