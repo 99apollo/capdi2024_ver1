@@ -331,6 +331,7 @@ public class DashboardFragment extends Fragment {
         }
 
         int temp = 0;
+        int total_cost = 0;
         try {
             JSONArray jsonArray = new JSONArray(json);
 
@@ -341,17 +342,20 @@ public class DashboardFragment extends Fragment {
                 String itemId = jsonObject.getString("name");
                 String itemValue = jsonObject.getString("item_value");
                 String count = jsonObject.getString("count");
+                String price = jsonObject.getString("price");
                 Log.e(TAG,"name confirm : "+itemId);
                 if (cartId.equals(inCartId)) {
-                    CartItem cartItem = new CartItem(cartId, itemId, itemValue,count);
-
+                    CartItem cartItem = new CartItem(cartId, itemId, itemValue,count,price);
                     cartItems.add(cartItem);
+                    total_cost=total_cost+Integer.getInteger(price);
                     temp++;
                 }
             }
 
             if (isAdded()) { // Fragment가 Activity에 연결되었는지 확인
                 TextView listCount = requireActivity().findViewById(R.id.list_count_input);
+                TextView totalCostInput = requireActivity().findViewById(R.id.cost_input);
+                totalCostInput.setText(String.valueOf(total_cost));
                 listCount.setText(String.valueOf(temp)); // 문자열로 변환
             }
         } catch (JSONException e) {

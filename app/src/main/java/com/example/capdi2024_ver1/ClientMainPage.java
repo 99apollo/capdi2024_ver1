@@ -1,7 +1,9 @@
 package com.example.capdi2024_ver1;
 import static android.content.ContentValues.TAG;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +31,7 @@ public class ClientMainPage extends AppCompatActivity {
     private SharedViewModel sharedViewModel;
 
     private DatabaseReference cartListRef;
+    private BluetoothReceiver bluetoothReceiver; // BluetoothReceiver 객체 선언
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +94,26 @@ public class ClientMainPage extends AppCompatActivity {
         navController.navigate(R.id.navigation_dashboard, bundle);  // navigation_dashboard에 데이터를 전달
         navController.navigate(R.id.navigation_notifications, bundle);  // navigation_dashboard에 데이터를 전달
         navController.navigate(R.id.navigation_home, bundle);  // navigation_dashboard에 데이터를 전달
+
+
+        // BluetoothReceiver 객체 생성
+        bluetoothReceiver = new BluetoothReceiver();
+
+        // BluetoothReceiver를 등록하여 특정 블루투스 기기의 연결 상태를 감지
+        registerBluetoothReceiver();
+
+    }
+    // BluetoothReceiver를 등록하는 메서드
+    private void registerBluetoothReceiver() {
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        registerReceiver(bluetoothReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 액티비티가 종료될 때 BluetoothReceiver를 해제
+        unregisterReceiver(bluetoothReceiver);
     }
 
 }
