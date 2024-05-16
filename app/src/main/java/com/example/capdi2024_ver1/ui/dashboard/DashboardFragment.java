@@ -345,10 +345,13 @@ public class DashboardFragment extends Fragment {
                 String price = jsonObject.getString("price");
                 Log.e(TAG,"name confirm : "+itemId);
                 if (cartId.equals(inCartId)) {
-                    CartItem cartItem = new CartItem(cartId, itemId, itemValue,count,price);
-                    cartItems.add(cartItem);
-                    total_cost=total_cost+Integer.getInteger(price);
-                    temp++;
+                    if (price != null && !price.isEmpty()) {
+                        int priceInt = Integer.parseInt(price);
+                        CartItem cartItem = new CartItem(cartId, itemId, itemValue, count, String.valueOf(priceInt));
+                        cartItems.add(cartItem);
+                        total_cost += priceInt;
+                        temp++;
+                    }
                 }
             }
 
