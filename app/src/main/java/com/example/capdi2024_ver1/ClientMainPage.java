@@ -1,14 +1,19 @@
 package com.example.capdi2024_ver1;
+
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,9 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.Manifest;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,18 +41,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class ClientMainPage extends AppCompatActivity {
 
     private ActivityClientMainPageBinding binding;
-    private boolean test =false;
+    private boolean test = false;
     private SharedViewModel sharedViewModel;
     private Handler handler;
     private Runnable bluetoothDiscoveryRunnable;
     private DatabaseReference cartListRef;
-    private BluetoothReceiver bluetoothReceiver; // BluetoothReceiver 객체 선언
     private BluetoothAdapter bluetoothAdapter;
+    private BluetoothLeScanner bluetoothLeScanner;
     private ArrayList<String> discoveredDevices = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -57,7 +61,7 @@ public class ClientMainPage extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_PERMISSION = 3;
     private static final int PERMISSION_REQUEST_CODE_S = 101;
     private static final int PERMISSION_REQUEST_CODE = 100;
-    private BroadcastReceiver receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +82,7 @@ public class ClientMainPage extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_client_main_page);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
-        Button test = findViewById(R.id.disconnect_button);
+
         // Intent로부터 데이터 받기
         Intent intent = getIntent();
         String userId = intent.getStringExtra("userId");
@@ -90,16 +94,16 @@ public class ClientMainPage extends AppCompatActivity {
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             Button disconnectButton = findViewById(R.id.disconnect_button);
-            Log.d(TAG, "id in requset: " + userId);
+            Log.d(TAG, "id in request: " + userId);
             cartListRef.child(userId).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DataSnapshot dataSnapshot = task.getResult();
                     if (dataSnapshot.exists()) {
                         // 사용자 cart_id가 존재할 때
-                        disconnectButton.setText("disconnet");
+                        disconnectButton.setText("disconnect");
 
                     } else {
-                        disconnectButton.setText("connet");
+                        disconnectButton.setText("connect");
                     }
                 } else {
                     // Firebase에서 오류가 발생했을 때 처리
@@ -112,8 +116,6 @@ public class ClientMainPage extends AppCompatActivity {
             }
         });
 
-
-
         // 이 데이터를 Fragment에 전달하는 방법 중 하나는 NavController를 통해 Bundle로 전달하는 것입니다.
         Bundle bundle = new Bundle();
         bundle.putString("userid", userId);
@@ -121,53 +123,39 @@ public class ClientMainPage extends AppCompatActivity {
         navController.navigate(R.id.navigation_notifications, bundle);  // navigation_dashboard에 데이터를 전달
         navController.navigate(R.id.navigation_home, bundle);  // navigation_dashboard에 데이터를 전달
 
-
-        // BluetoothReceiver 객체 생성
-        bluetoothReceiver = new BluetoothReceiver();
-
-        // BluetoothReceiver를 등록하여 특정 블루투스 기기의 연결 상태를 감지
-        registerBluetoothReceiver();
         // BluetoothAdapter 초기화
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
         if (bluetoothAdapter == null) {
             // 장치가 Bluetooth을 지원하지 않는 경우 처리
             Toast.makeText(this, "이 장치는 Bluetooth을 지원하지 않습니다.", Toast.LENGTH_SHORT).show();
             finish(); // 앱 종료
         }
 
+        // BluetoothLeScanner 초기화
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+
         // 위치 권한을 확인하고 요청
         checkAndRequestLocationPermission();
-
-
     }
+
     private void checkAndRequestLocationPermission() {
         // 위치 권한이 허용되어 있는지 확인
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             // 위치 권한이 허용되지 않은 경우 권한 요청
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_REQUEST_CODE_S);
-        }else {
-
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_REQUEST_CODE_S);
+        } else {
             Log.e(TAG, "12312412412412421");
             // 권한이 허용된 경우 Bluetooth 장치 검색 시작
             startBluetoothDiscovery();
         }
-
-    }
-
-    // BluetoothReceiver를 등록하는 메서드
-    private void registerBluetoothReceiver() {
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-        registerReceiver(bluetoothReceiver, filter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // 액티비티가 종료될 때 BluetoothReceiver를 해제
-        unregisterReceiver(bluetoothReceiver);
-
         // 액티비티가 종료될 때 Bluetooth 탐지 중지
         stopBluetoothDiscovery();
     }
@@ -188,33 +176,70 @@ public class ClientMainPage extends AppCompatActivity {
             //checkAndRequestBluetoothConnectPermission();
         }
     }
+
     private void checkAndRequestBluetoothScanPermission() {
         Log.e(TAG, "chaseefasegseg");
         // BLUETOOTH_SCAN 권한이 허용되어 있는지 확인
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED
-        ) {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             // BLUETOOTH_SCAN 권한이 허용되지 않은 경우 BLUETOOTH_ADMIN 권한 요청
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BLUETOOTH_PERMISSION);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BLUETOOTH_PERMISSION);
         } else {
             // BLUETOOTH_SCAN 권한이 허용된 경우 Bluetooth 장치 검색 시작
             // 핸들러를 사용하여 일정한 시간 간격으로 블루투스 탐지를 수행
             startBluetoothDiscoveryWithInterval();
         }
     }
+
+    // 주기적으로 BLE 스캔을 수행하는 메서드
+    private void startBluetoothDiscoveryWithInterval() {
+        handler = new Handler();
+        bluetoothDiscoveryRunnable = new Runnable() {
+            @Override
+            public void run() {
+                doBluetoothDiscovery();
+                handler.postDelayed(this, 4000); // 4초마다 실행 (2초 스캔 + 2초 대기)
+            }
+        };
+        handler.post(bluetoothDiscoveryRunnable);
+    }
+
+    // BLE 스캔을 중지하는 메서드
+    private void stopBluetoothDiscovery() {
+        if (bluetoothLeScanner != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            bluetoothLeScanner.stopScan(leScanCallback);
+        }
+        if (handler != null && bluetoothDiscoveryRunnable != null) {
+            handler.removeCallbacks(bluetoothDiscoveryRunnable);
+        }
+    }
+
+    // BLE 스캔을 시작하는 메서드
     private void doBluetoothDiscovery() {
-        // Bluetooth 장치 검색을 위한 BroadcastReceiver 등록
-        receiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    // 발견된 Bluetooth 장치를 가져오기
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            return;
+        }
 
-                    // 발견된 장치를 리스트에 추가
+        // 기존의 스캔 작업이 있으면 중지
+        stopBluetoothDiscovery();
 
-
-                    if (ActivityCompat.checkSelfPermission(ClientMainPage.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        if (bluetoothLeScanner != null) {
+            // 2초 동안 스캔
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (ActivityCompat.checkSelfPermission(ClientMainPage.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
                         // here to request the missing permissions, and then overriding
@@ -222,60 +247,81 @@ public class ClientMainPage extends AppCompatActivity {
                         //                                          int[] grantResults)
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
-                        Log.e(TAG, "nothing");
                         return;
                     }
-                    Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-                    if(!test){
-
-                        for(BluetoothDevice device1 : pairedDevices){
-
-                            String deviceName1 = device1.getName();
-                            String deviceAddress1 = device1.getAddress();
-                            discoveredDevices.add(deviceName1 + "\n" + deviceAddress1);
-                            if(deviceAddress1.equals("10:E4:C2:86:03:6A")){
-                                showFingerprintDialog(context);
-                                stopBluetoothDiscovery();
-                            }
-                        }
-                        test=true;
-                    }
-                    String deviceName = device.getName();
-                    String deviceAddress = device.getAddress();
-                    Log.e(TAG, "name"+deviceName+"  "+deviceAddress);
-                    discoveredDevices.add(deviceName + "\n" + deviceAddress);
-                    if(deviceAddress.equals("10:E4:C2:86:03:6A")){
-                        stopBluetoothDiscovery();
-                        showFingerprintDialog(context);
-                    }
-
+                    bluetoothLeScanner.stopScan(leScanCallback);
                 }
-            }
-        };
-
-        // 장치 검색을 위한 필터 설정
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(receiver, filter);
-
-        // Bluetooth 장치 검색 시작
-        bluetoothAdapter.startDiscovery();
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT) {
-            // Bluetooth 활성화 요청의 결과 확인
-            if (resultCode == RESULT_OK) {
-                // Bluetooth이 성공적으로 활성화된 경우, Bluetooth 장치 검색 시작
-                doBluetoothDiscovery();
-            } else {
-                // 사용자가 Bluetooth 활성화를 거부한 경우
-                Toast.makeText(this, "Bluetooth을 활성화하지 않았습니다.", Toast.LENGTH_SHORT).show();
-            }
+            }, 2000);
+            bluetoothLeScanner.startScan(leScanCallback);
         }
     }
+
+    // BLE 스캔 콜백 정의
+    private final ScanCallback leScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+            BluetoothDevice device = result.getDevice();
+            if (ActivityCompat.checkSelfPermission(ClientMainPage.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            String deviceName = device.getName();
+            String deviceAddress = device.getAddress();
+            Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress);
+
+            if (!discoveredDevices.contains(deviceName + "\n" + deviceAddress)) {
+                discoveredDevices.add(deviceName + "\n" + deviceAddress);
+                if ("10:E4:C2:86:03:6A".equals(deviceAddress)) {
+                    showFingerprintDialog(ClientMainPage.this);
+                    stopBluetoothDiscovery();
+                }
+            }
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            super.onBatchScanResults(results);
+            for (ScanResult result : results) {
+                onScanResult(ScanSettings.CALLBACK_TYPE_ALL_MATCHES, result);
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            super.onScanFailed(errorCode);
+            Log.e(TAG, "BLE Scan Failed with code: " + errorCode);
+        }
+    };
+
+    private void showFingerprintDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("지문 인증");
+        builder.setMessage("블루투스 기기에 연결되었습니다. 지문을 스캔하여 계속하시겠습니까?");
+        stopBluetoothDiscovery();
+        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // 지문인식 로직을 여기에 구현
+                // 예를 들어 지문인식 API를 호출하거나 해당 기능을 수행하는 코드를 작성합니다.
+            }
+        });
+        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // 취소 버튼 클릭 시 동작 (생략 가능)
+                startBluetoothDiscoveryWithInterval();
+            }
+        });
+        builder.show();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -299,51 +345,4 @@ public class ClientMainPage extends AppCompatActivity {
             }
         }
     }
-    private void showFingerprintDialog(Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("지문 인증");
-        builder.setMessage("블루투스 기기에 연결되었습니다. 지문을 스캔하여 계속하시겠습니까?");
-        stopBluetoothDiscovery();
-        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // 지문인식 로직을 여기에 구현
-                // 예를 들어 지문인식 API를 호출하거나 해당 기능을 수행하는 코드를 작성합니다.
-            }
-        });
-        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // 취소 버튼 클릭 시 동작 (생략 가능)
-                startBluetoothDiscoveryWithInterval();
-            }
-        });
-        builder.show();
-    }
-
-    private void startBluetoothDiscoveryWithInterval() {
-        // 핸들러를 사용하여 일정한 시간 간격으로 블루투스 탐지를 수행
-        handler = new Handler();
-        bluetoothDiscoveryRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Bluetooth 탐지 수행
-                doBluetoothDiscovery();
-
-                // 다음 탐지를 위해 핸들러에 다시 자신을 등록
-                handler.postDelayed(this, 10000); // 10초마다 탐지 수행
-            }
-        };
-
-        // 최초 탐지 수행을 위해 핸들러에 작업 등록
-        handler.post(bluetoothDiscoveryRunnable);
-    }
-
-    private void stopBluetoothDiscovery() {
-        // 핸들러가 더 이상 실행되지 않도록 제거
-        if (handler != null && bluetoothDiscoveryRunnable != null) {
-            handler.removeCallbacks(bluetoothDiscoveryRunnable);
-        }
-    }
-
 }

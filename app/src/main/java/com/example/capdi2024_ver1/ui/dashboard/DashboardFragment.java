@@ -343,7 +343,7 @@ public class DashboardFragment extends Fragment {
                 String itemValue = jsonObject.getString("item_value");
                 String count = jsonObject.getString("count");
                 String price = jsonObject.getString("price");
-                Log.e(TAG,"name confirm : "+itemId);
+                Log.e(TAG,"name confirm : "+price);
                 if (cartId.equals(inCartId)) {
                     if (price != null && !price.isEmpty()) {
                         int priceInt = Integer.parseInt(price);
@@ -369,14 +369,21 @@ public class DashboardFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        stopPeriodicFetching(); // `Fragment`가 일시정지 상태로 갈 때 주기적 작업 중단
-    }
-    @Override
     public void onDestroy() {
         super.onDestroy();
         stopPeriodicFetching(); // `Fragment`가 파괴될 때 주기적 작업 중단
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopPeriodicFetching(); // Fragment가 일시정지 상태로 갈 때 주기적 작업 중단
+
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
 }
