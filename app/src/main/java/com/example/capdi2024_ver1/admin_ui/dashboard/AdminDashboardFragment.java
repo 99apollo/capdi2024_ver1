@@ -22,6 +22,11 @@ import com.example.capdi2024_ver1.R;
 import com.example.capdi2024_ver1.databinding.FragmentAdminDashboardBinding;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,11 +42,19 @@ public class AdminDashboardFragment extends Fragment {
     private List<ItemData> itemDataList = new ArrayList<>();
     private ItemAdapter itemAdapter;
 
+
+    private List<CartCheckItem> cartCheckItemList = new ArrayList<>();
+    private CartCheckItemAdapter cartCheckItemAdapter;
+    private DatabaseReference cartCheckListRef;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAdminDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        cartCheckListRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
+
 
         // Get references to views
         RadioGroup radioGroup = binding.radioGroup;
@@ -53,15 +66,20 @@ public class AdminDashboardFragment extends Fragment {
         // Setup RecyclerView
         binding.adminDashboardRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         itemAdapter = new ItemAdapter(new ArrayList<>());
+        cartCheckItemAdapter = new CartCheckItemAdapter(new ArrayList<>());
         binding.adminDashboardRecyclerView.setAdapter(itemAdapter);
+
 
         // Set listener for RadioGroup
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.radioButton1) {
                 chipGroup.setVisibility(View.VISIBLE); // Show chip group when option 1 is selected
+                binding.adminDashboardRecyclerView.setAdapter(itemAdapter);
                 fetchItemData(); // Option 1이 선택될 때 데이터 가져오기
-            } else {
-                chipGroup.setVisibility(View.GONE); // Hide when other options are selected
+            } else if (checkedId == R.id.radioButton2) {
+                chipGroup.setVisibility(View.GONE); // Hide chip group when option 2 is selected
+                binding.adminDashboardRecyclerView.setAdapter(cartCheckItemAdapter); // Use cart check item adapter
+                fetchCartCheckList(); // Option 2이 선택될 때 카트 체크 리스트 가져오기
             }
         });
 
@@ -130,6 +148,25 @@ public class AdminDashboardFragment extends Fragment {
         }
         itemAdapter.updateItemList(filteredList);
     }
+    private void fetchCartCheckList() {
+        cartCheckListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                cartCheckItemList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String cartId = snapshot.getKey();
+                    String userId = snapshot.getValue(String.class);
+                    cartCheckItemList.add(new CartCheckItem(cartId, userId));
+                }
+                cartCheckItemAdapter.updateItemList(cartCheckItemList);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("AdminDashboard", "Error fetching cart check list: " + databaseError.getMessage());
+                Toast.makeText(requireContext(), "Failed to fetch cart check list", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     @Override
     public void onDestroyView() {
@@ -137,3 +174,4 @@ public class AdminDashboardFragment extends Fragment {
         binding = null;
     }
 }
+
