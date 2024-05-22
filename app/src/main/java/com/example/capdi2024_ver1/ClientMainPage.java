@@ -319,6 +319,13 @@ public class ClientMainPage extends AppCompatActivity {
                 startBluetoothDiscoveryWithInterval();
             }
         });
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                // 다른 행동시
+                startBluetoothDiscoveryWithInterval();
+            }
+        });
         builder.show();
     }
 

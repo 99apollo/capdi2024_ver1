@@ -90,7 +90,7 @@ public class DashboardFragment extends Fragment {
         disconnet_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(disconnet_Button.getText().equals("disconnet")){
+                if(disconnet_Button.getText().equals("disconnect")){
                     cartListRef.child(userId).get().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             DataSnapshot dataSnapshot = task.getResult();
@@ -148,10 +148,10 @@ public class DashboardFragment extends Fragment {
                 DataSnapshot dataSnapshot = task.getResult();
                 if (dataSnapshot.exists()) {
                     // 사용자 cart_id가 존재할 때
-                    button.setText("disconnet");
+                    button.setText("disconnect");
 
                 } else {
-                    button.setText("connet");
+                    button.setText("connect");
                 }
             } else {
                 // Firebase에서 오류가 발생했을 때 처리
