@@ -10,42 +10,60 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.example.capdi2024_ver1.Purchase;
 import com.example.capdi2024_ver1.PurchaseAdapter;
 import com.example.capdi2024_ver1.R;
 import com.example.capdi2024_ver1.SharedViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationsFragment extends Fragment {
 
     private SharedViewModel sharedViewModel;
-    private RecyclerView recyclerView;
     private PurchaseAdapter purchaseAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
 
-        recyclerView = root.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        final TextView userIdTextView = root.findViewById(R.id.user_id_text_view);
+        final TextView userNameTextView = root.findViewById(R.id.user_name_text_view);
+        final TextView userEmailTextView = root.findViewById(R.id.user_email_text_view);
+        RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        TextView userIdTextView = root.findViewById(R.id.user_id_text_view);
-        TextView userNameTextView = root.findViewById(R.id.user_name_text_view);
-        TextView userEmailTextView = root.findViewById(R.id.user_email_text_view);
+        sharedViewModel.getUserId().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String userId) {
+                userIdTextView.setText("User ID: " + userId);
+            }
+        });
 
-        sharedViewModel.getUserId().observe(getViewLifecycleOwner(), id -> userIdTextView.setText("User ID: " + id));
+        sharedViewModel.getUserName().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String userName) {
+                userNameTextView.setText("User Name: " + userName);
+            }
+        });
 
-        sharedViewModel.getUserName().observe(getViewLifecycleOwner(), name -> userNameTextView.setText("User Name: " + name));
+        sharedViewModel.getUserEmail().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String userEmail) {
+                userEmailTextView.setText("User Email: " + userEmail);
+            }
+        });
 
-        sharedViewModel.getUserEmail().observe(getViewLifecycleOwner(), email -> userEmailTextView.setText("User Email: " + email));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        purchaseAdapter = new PurchaseAdapter(new ArrayList<>());
+        recyclerView.setAdapter(purchaseAdapter);
 
-        sharedViewModel.getPurchases().observe(getViewLifecycleOwner(), purchaseList -> {
-            purchaseAdapter = new PurchaseAdapter(purchaseList);
-            recyclerView.setAdapter(purchaseAdapter);
+        sharedViewModel.getPurchases().observe(getViewLifecycleOwner(), new Observer<List<Purchase>>() {
+            @Override
+            public void onChanged(List<Purchase> purchases) {
+                purchaseAdapter.setPurchases(purchases);
+            }
         });
 
         return root;
