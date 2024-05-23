@@ -34,7 +34,15 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.capdi2024_ver1.databinding.ActivityClientMainPageBinding;
+import com.example.capdi2024_ver1.ui.dashboard.CartItem;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -50,6 +58,7 @@ public class ClientMainPage extends AppCompatActivity {
     private boolean test = false;
     private SharedViewModel sharedViewModel;
     private Handler handler;
+    private String cart_ID;
     private Runnable bluetoothDiscoveryRunnable;
     private DatabaseReference cartListRef;
     private BluetoothAdapter bluetoothAdapter;
@@ -101,7 +110,6 @@ public class ClientMainPage extends AppCompatActivity {
                     if (dataSnapshot.exists()) {
                         // 사용자 cart_id가 존재할 때
                         disconnectButton.setText("disconnect");
-
                     } else {
                         disconnectButton.setText("connect");
                     }
@@ -198,7 +206,7 @@ public class ClientMainPage extends AppCompatActivity {
             @Override
             public void run() {
                 doBluetoothDiscovery();
-                handler.postDelayed(this, 4000); // 4초마다 실행 (2초 스캔 + 2초 대기)
+                handler.postDelayed(this, 3000); // 4초마다 실행 (2초 스캔 + 2초 대기)
             }
         };
         handler.post(bluetoothDiscoveryRunnable);
@@ -275,13 +283,13 @@ public class ClientMainPage extends AppCompatActivity {
             String deviceName = device.getName();
             String deviceAddress = device.getAddress();
             Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress);
-
+            if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
+                showFingerprintDialog(ClientMainPage.this);
+                stopBluetoothDiscovery();
+            }
             if (!discoveredDevices.contains(deviceName + "\n" + deviceAddress)) {
                 discoveredDevices.add(deviceName + "\n" + deviceAddress);
-                if ("10:E4:C2:86:03:6A".equals(deviceAddress)) {
-                    showFingerprintDialog(ClientMainPage.this);
-                    stopBluetoothDiscovery();
-                }
+
             }
         }
 
@@ -302,14 +310,15 @@ public class ClientMainPage extends AppCompatActivity {
 
     private void showFingerprintDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("지문 인증");
-        builder.setMessage("블루투스 기기에 연결되었습니다. 지문을 스캔하여 계속하시겠습니까?");
+        builder.setTitle("결제");
+        builder.setMessage("결제 하시겠습니까?");
         stopBluetoothDiscovery();
         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // 지문인식 로직을 여기에 구현
                 // 예를 들어 지문인식 API를 호출하거나 해당 기능을 수행하는 코드를 작성합니다.
+
             }
         });
         builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -327,6 +336,9 @@ public class ClientMainPage extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+    private void removeItemAndCart(){
+
     }
 
     @Override
