@@ -8,6 +8,16 @@ public class ItemData {
     private double price;
     private int amount;
 
+    // Constructor
+    public ItemData(String item_value, String categori, String name, String manufacturer, double price, int amount) {
+        this.item_value = item_value;
+        this.categori = categori;
+        this.name = name;
+        this.manufacturer = manufacturer;
+        this.price = price;
+        this.amount = amount;
+    }
+
     // Getters and setters
     public String getItem_value() { return item_value; }
     public void setItem_value(String item_value) { this.item_value = item_value; }

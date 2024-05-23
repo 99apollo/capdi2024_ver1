@@ -46,7 +46,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.lifecycle.ViewModelProvider;
-
 public class DashboardFragment extends Fragment {
 
     private RecyclerView recyclerView;
@@ -58,6 +57,7 @@ public class DashboardFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private Handler handler;
     private Runnable fetchRunnable;
+    private List<CartItem> currentCartItems = new ArrayList<>(); // 기존 데이터 저장
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -79,18 +79,17 @@ public class DashboardFragment extends Fragment {
         sharedViewModel.getUserId().observe(getViewLifecycleOwner(), new Observer<String>() {  // `LiveData` 관찰
             @Override
             public void onChanged(String newUserId) {
-                userId=newUserId;
-                checkCartID(userId,disconnet_Button);
+                userId = newUserId;
+                checkCartID(userId, disconnet_Button);
                 Log.d(TAG, "idin: " + userId);
                 checkAndRequestCartId(userId);
             }
         });
 
-
         disconnet_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(disconnet_Button.getText().equals("disconnet")){
+                if (disconnet_Button.getText().equals("disconnect")) {
                     cartListRef.child(userId).get().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             DataSnapshot dataSnapshot = task.getResult();
@@ -105,7 +104,7 @@ public class DashboardFragment extends Fragment {
                             // Firebase에서 오류가 발생했을 때 처리
                         }
                     });
-                }else{
+                } else {
                     checkAndRequestCartId1(userId);
                 }
 
@@ -113,6 +112,7 @@ public class DashboardFragment extends Fragment {
         });
         return root;
     }
+
     private void startPeriodicFetching(String cartID) {
         if (handler == null) {
             handler = new Handler(Looper.getMainLooper()); // `Handler` 초기화
@@ -125,7 +125,7 @@ public class DashboardFragment extends Fragment {
             public void run() {
                 sendHttpRequest(cartID); // HTTP 요청 수행
                 handler.postDelayed(this, 10000); // 10초 후에 다시 실행
-                Log.e(TAG,"test"+cartID);
+                Log.e(TAG, "test" + cartID);
             }
         };
 
@@ -140,38 +140,38 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-
-    private void checkCartID(String userId,Button button) {
+    private void checkCartID(String userId, Button button) {
         Log.d(TAG, "id in requset: " + userId);
         cartListRef.child(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DataSnapshot dataSnapshot = task.getResult();
                 if (dataSnapshot.exists()) {
                     // 사용자 cart_id가 존재할 때
-                    button.setText("disconnet");
+                    button.setText("disconnect");
 
                 } else {
-                    button.setText("connet");
+                    button.setText("connect");
                 }
             } else {
                 // Firebase에서 오류가 발생했을 때 처리
             }
         });
     }
-    private void releaseCart(String cartId){
+
+    private void releaseCart(String cartId) {
         // `RequestQueue`가 `null`인지 확인하고, `null`일 경우 초기화
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(requireContext());
         }
-        String url = "http://3.35.9.191/test2.php?username=app&password=app2024&cart_id="+cartId;  // 요청할 URL
+        String url = "http://3.35.9.191/test2.php?username=app&password=app2024&cart_id=" + cartId;  // 요청할 URL
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        List<CartItem> cartItems = parseJson(response,cartId);
+                        List<CartItem> cartItems = parseJson(response, cartId);
                         Log.e(TAG, "data : " + cartItems);
-                        if(cartItems.isEmpty()) {
+                        if (cartItems.isEmpty()) {
                             cartListRef.child(userId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
@@ -194,7 +194,7 @@ public class DashboardFragment extends Fragment {
                                 }
                             });
 
-                        }else{
+                        } else {
                             Toast.makeText(requireActivity(), "카트 안을 비워 주세요", Toast.LENGTH_LONG).show();
                             loadCartItems(cartId);
                         }
@@ -257,7 +257,7 @@ public class DashboardFragment extends Fragment {
         builder.setPositiveButton("OK", (dialog, which) -> {
             String cartId = input.getText().toString();
             cartListCheckRef.child(cartId).get().addOnCompleteListener(task -> {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     DataSnapshot dataSnapshot = task.getResult();
                     if (dataSnapshot.exists()) {
                         // cart 사용자 존재시
@@ -268,7 +268,7 @@ public class DashboardFragment extends Fragment {
                         cartListRef.child(userId).child("cart_id").setValue(cartId);
                         cartListCheckRef.child(cartId).setValue(userId);
                         Button button1 = requireActivity().findViewById(R.id.disconnect_button);
-                        button1.setText("disconnet");
+                        button1.setText("disconnect");
                         loadCartItems(cartId);
 
                     }
@@ -302,15 +302,14 @@ public class DashboardFragment extends Fragment {
         }
 
         // 요청할 URL
-        String url = "http://3.35.9.191/test2.php?username=app&password=app2024&cart_id="+cartID;
+        String url = "http://3.35.9.191/test2.php?username=app&password=app2024&cart_id=" + cartID;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        List<CartItem> cartItems = parseJson(response, cartID);
-                        adapter = new CartItemAdapter(cartItems);
-                        recyclerView.setAdapter(adapter);
+                        List<CartItem> newCartItems = parseJson(response, cartID);
+                        updateCartItems(newCartItems);
                     }
                 },
                 new Response.ErrorListener() {
@@ -335,7 +334,6 @@ public class DashboardFragment extends Fragment {
         try {
             JSONArray jsonArray = new JSONArray(json);
 
-
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 String cartId = jsonObject.getString("cart_id");
@@ -343,7 +341,7 @@ public class DashboardFragment extends Fragment {
                 String itemValue = jsonObject.getString("item_value");
                 String count = jsonObject.getString("count");
                 String price = jsonObject.getString("price");
-                Log.e(TAG,"name confirm : "+itemId);
+                Log.e(TAG, "name confirm : " + itemId);
                 if (cartId.equals(inCartId)) {
                     if (price != null && !price.isEmpty()) {
                         int priceInt = Integer.parseInt(price);
@@ -368,15 +366,44 @@ public class DashboardFragment extends Fragment {
         return cartItems;
     }
 
+    private void updateCartItems(List<CartItem> newCartItems) {
+        List<CartItem> itemsToAdd = new ArrayList<>();
+
+        // 새로 받아온 데이터와 기존 데이터를 비교하여 없는 경우에만 추가
+        for (CartItem newItem : newCartItems) {
+            boolean exists = false;
+            for (CartItem currentItem : currentCartItems) {
+                if (currentItem.getItemId().equals(newItem.getItemId())) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                itemsToAdd.add(newItem);
+            }
+        }
+
+        // 새로운 아이템이 있을 경우만 추가하고 어댑터 갱신
+        if (!itemsToAdd.isEmpty()) {
+            currentCartItems.addAll(itemsToAdd);
+            if (adapter == null) {
+                adapter = new CartItemAdapter(currentCartItems);
+                recyclerView.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
         stopPeriodicFetching(); // `Fragment`가 일시정지 상태로 갈 때 주기적 작업 중단
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         stopPeriodicFetching(); // `Fragment`가 파괴될 때 주기적 작업 중단
     }
-
 }
