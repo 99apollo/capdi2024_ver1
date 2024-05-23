@@ -1,25 +1,32 @@
 package com.example.capdi2024_ver1;
 
+
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 public class BluetoothReceiver extends BroadcastReceiver {
     // 특정 블루투스 기기의 MAC 주소
-    private static final String TARGET_DEVICE_MAC_ADDRESS = "00:11:22:33:44:55"; // 예시 MAC 주소
+    private static final String TARGET_DEVICE_MAC_ADDRESS = "64:03:7F:A8:E8:F7"; // 예시 MAC 주소
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
+        Log.e(TAG,"On bluetooth Activity");
+
         if (action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
             // 연결된 블루투스 기기의 MAC 주소 가져오기
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             String connectedDeviceMacAddress = device.getAddress();
+            Log.e(TAG,"test bluetooth address"+connectedDeviceMacAddress);
 
             // 특정 기기와의 연결 여부 확인
             if (TARGET_DEVICE_MAC_ADDRESS.equals(connectedDeviceMacAddress)) {
