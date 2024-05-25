@@ -368,8 +368,23 @@ public class DashboardFragment extends Fragment {
 
     private void updateCartItems(List<CartItem> newCartItems) {
         List<CartItem> itemsToAdd = new ArrayList<>();
+        List<CartItem> itemsToRemove = new ArrayList<>();
 
-        // 새로 받아온 데이터와 기존 데이터를 비교하여 없는 경우에만 추가
+        // 기존 데이터를 새 데이터와 비교하여 없는 경우에만 제거
+        for (CartItem currentItem : currentCartItems) {
+            boolean exists = false;
+            for (CartItem newItem : newCartItems) {
+                if (currentItem.getItemId().equals(newItem.getItemId())) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                itemsToRemove.add(currentItem);
+            }
+        }
+
+        // 새 데이터를 기존 데이터와 비교하여 없는 경우에만 추가
         for (CartItem newItem : newCartItems) {
             boolean exists = false;
             for (CartItem currentItem : currentCartItems) {
@@ -383,15 +398,18 @@ public class DashboardFragment extends Fragment {
             }
         }
 
-        // 새로운 아이템이 있을 경우만 추가하고 어댑터 갱신
-        if (!itemsToAdd.isEmpty()) {
-            currentCartItems.addAll(itemsToAdd);
-            if (adapter == null) {
-                adapter = new CartItemAdapter(currentCartItems);
-                recyclerView.setAdapter(adapter);
-            } else {
-                adapter.notifyDataSetChanged();
-            }
+        // 기존 리스트에서 제거할 아이템들을 삭제
+        currentCartItems.removeAll(itemsToRemove);
+
+        // 새로운 아이템이 있을 경우 추가
+        currentCartItems.addAll(itemsToAdd);
+
+        // 어댑터 갱신
+        if (adapter == null) {
+            adapter = new CartItemAdapter(currentCartItems);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.notifyDataSetChanged();
         }
     }
 
