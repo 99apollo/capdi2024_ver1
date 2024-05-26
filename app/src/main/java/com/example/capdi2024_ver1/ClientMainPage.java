@@ -233,7 +233,10 @@ public class ClientMainPage extends AppCompatActivity {
         bluetoothDiscoveryRunnable = new Runnable() {
             @Override
             public void run() {
-                doBluetoothDiscovery();
+                if(cart_ID != null){
+                    doBluetoothDiscovery();
+                }
+
                 handler.postDelayed(this, 3000); // 4초마다 실행 (2초 스캔 + 2초 대기)
             }
         };
@@ -457,6 +460,7 @@ public class ClientMainPage extends AppCompatActivity {
     }
 
     public void Payment(View v) {
+        stopBluetoothDiscovery();
         BootUser user = new BootUser().setPhone("010-1234-5678"); // 구매자 정보
 
         BootExtra extra = new BootExtra().setCardQuota("0,2,3"); // 일시불, 2개월, 3개월 할부 허용
@@ -485,8 +489,8 @@ public class ClientMainPage extends AppCompatActivity {
                     Payload payload = new Payload();
                     payload.setApplicationId("664d8baebc174e41fa1e1187") //고정 ID
                             .setOrderName("부트페이 결제테스트")
-                            .setPg("나이스페이") //고정 결제 업체
-                            .setMethod("휴대폰") //고정 결제 수단
+                            .setPg("카카오페이") //고정 결제 업체
+                            .setMethod("") //고정 결제 수단
                             .setOrderId("1234")
                             .setPrice(calculateTotalPrice(cartItems)) // 장바구니 총 가격
                             .setUser(user)
