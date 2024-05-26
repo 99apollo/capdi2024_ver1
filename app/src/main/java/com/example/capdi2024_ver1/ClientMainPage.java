@@ -35,6 +35,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -49,8 +50,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import kr.co.bootpay.android.Bootpay;
+import kr.co.bootpay.android.events.BootpayEventListener;
+import kr.co.bootpay.android.models.BootExtra;
+import kr.co.bootpay.android.models.BootItem;
+import kr.co.bootpay.android.models.BootUser;
+import kr.co.bootpay.android.models.Payload;
 
 public class ClientMainPage extends AppCompatActivity {
 
@@ -70,6 +80,10 @@ public class ClientMainPage extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_PERMISSION = 3;
     private static final int PERMISSION_REQUEST_CODE_S = 101;
     private static final int PERMISSION_REQUEST_CODE = 100;
+
+    private DatabaseReference cartListCheckRef;
+
+    private RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +113,8 @@ public class ClientMainPage extends AppCompatActivity {
         sharedViewModel.setUserId(userId);
 
         cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
+
+        cartListCheckRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
         // `Activity`에서 `NavController`를 사용하여 목적지 변경을 감지
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
@@ -110,6 +126,8 @@ public class ClientMainPage extends AppCompatActivity {
                     if (dataSnapshot.exists()) {
                         // 사용자 cart_id가 존재할 때
                         disconnectButton.setText("disconnect");
+                        cart_ID = dataSnapshot.child("cart_id").getValue().toString();
+                        Log.e(TAG, "cart ID " + cart_ID);
                     } else {
                         disconnectButton.setText("connect");
                     }
@@ -241,6 +259,32 @@ public class ClientMainPage extends AppCompatActivity {
         // 기존의 스캔 작업이 있으면 중지
         stopBluetoothDiscovery();
 
+        Intent intent = getIntent();
+        String userId = intent.getStringExtra("userId");
+
+        cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
+        cartListRef.child(userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot dataSnapshot = task.getResult();
+                if (dataSnapshot.exists()) {
+                    // 사용자 cart_id가 존재할 때
+                    String cartId = dataSnapshot.child("cart_id").getValue(String.class);
+                    if (cartId != null && !cartId.isEmpty()) {
+                        Log.e(TAG, "cart 인식 성공 블루투스 시작 " + cartId);
+                        startBluetoothScanning();
+                    } else {
+                        Log.e(TAG, "cart 연결 안됨 블루투스 멈춤 " + cartId);
+                    }
+                } else {
+                    Log.e(TAG, "Firebase에서 데이터 가져오기 실패");
+                }
+            } else {
+                Log.e(TAG, "Firebase에서 오류 발생", task.getException());
+            }
+        });
+    }
+
+    private void startBluetoothScanning() {
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         if (bluetoothLeScanner != null) {
             // 2초 동안 스캔
@@ -263,6 +307,7 @@ public class ClientMainPage extends AppCompatActivity {
             bluetoothLeScanner.startScan(leScanCallback);
         }
     }
+
 
     // BLE 스캔 콜백 정의
     private final ScanCallback leScanCallback = new ScanCallback() {
@@ -316,9 +361,9 @@ public class ClientMainPage extends AppCompatActivity {
         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // 지문인식 로직을 여기에 구현
+                // 결제 로직을 여기에 구현
                 // 예를 들어 지문인식 API를 호출하거나 해당 기능을 수행하는 코드를 작성합니다.
-
+                Payment(null);
             }
         });
         builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -337,9 +382,139 @@ public class ClientMainPage extends AppCompatActivity {
         });
         builder.show();
     }
-    private void removeItemAndCart(){
+    private void removeItemAndCart() {
+        // `RequestQueue`가 `null`인지 확인하고, `null`일 경우 초기화
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(this);
+        }
+        // 요청할 URL
+        String url = "http://3.35.9.191/del3.php?cart_id=" + cart_ID;
 
+        cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
+        cartListCheckRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
+        Intent intent = getIntent();
+        String userId = intent.getStringExtra("userId");
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e(TAG, "url response : " + response);
+                        Log.e(TAG, "user_ID_in response : " + userId);
+
+                        // Trim the response to remove any leading or trailing whitespace
+                        if (response.trim().equals("true")) {
+                            Log.e(TAG, "url response : " + response);
+                            Log.e(TAG, "user_ID_in response : " + userId);
+                            Log.e(TAG, "연결 카트 초기화? : ");
+
+                            cartListRef.child(userId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    cartListCheckRef.child(cart_ID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.e(TAG, "연결 카트 초기화? : ");
+                                            Toast.makeText(ClientMainPage.this, "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
+                                            Button disconnect = findViewById(R.id.disconnect_button);
+                                            disconnect.setText("connect");
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e(TAG, "연결 카트 check 초기화 실패 ");
+                                        }
+                                    });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, "연결 카트 리스트 초기화 실패 ");
+                                }
+                            });
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 에러 처리
+                        Log.e(TAG, "Volley error: " + error.getMessage());
+                    }
+                });
+
+        requestQueue.add(stringRequest);
     }
+    public void Payment(View v) {
+        BootUser user = new BootUser().setPhone("010-1234-5678"); // 구매자 정보
+
+        BootExtra extra = new BootExtra()
+                .setCardQuota("0,2,3"); // 일시불, 2개월, 3개월 할부 허용, 할부는 최대 12개월까지 사용됨 (5만원 이상 구매시 할부허용 범위)
+
+
+        List<BootItem> items = new ArrayList<>();
+        BootItem item1 = new BootItem().setName("마우스").setId("ITEM_CODE_MOUSE").setQty(1).setPrice(500d);
+        BootItem item2 = new BootItem().setName("키보드").setId("ITEM_KEYBOARD_MOUSE").setQty(1).setPrice(500d);
+        items.add(item1);
+        items.add(item2);
+
+        Payload payload = new Payload();
+        payload.setApplicationId("664d8baebc174e41fa1e1187") //고정 ID
+                .setOrderName("부트페이 결제테스트")
+                .setPg("나이스페이") //고정 결제 업체
+                .setMethod("휴대폰") //고정 결제 수단
+                .setOrderId("1234")
+                .setPrice(1000d) //1000원
+                .setUser(user)
+                .setExtra(extra)
+                .setItems(items);
+
+        Map<String, Object> map = new HashMap<>();
+        // map.put("1", "abcdef"); 없어도 되는 부분, 추가 정보 기입시 사용
+        payload.setMetadata(map);
+
+        Bootpay.init(getSupportFragmentManager(), getApplicationContext())
+                .setPayload(payload)
+                .setEventListener(new BootpayEventListener() {
+                    @Override
+                    public void onCancel(String data) {
+                        Log.d("bootpay", "cancel: " + data);
+                        startBluetoothDiscoveryWithInterval();
+                    }
+
+                    @Override
+                    public void onError(String data) {
+                        Log.d("bootpay", "error: " + data);
+                        startBluetoothDiscoveryWithInterval();
+                    }
+
+                    @Override
+                    public void onClose() {
+                        Bootpay.removePaymentWindow();
+                        startBluetoothDiscoveryWithInterval();
+                    }
+
+                    @Override
+                    public void onIssued(String data) {
+                        Log.d("bootpay", "issued: " +data);
+                    }
+
+                    @Override
+                    public boolean onConfirm(String data) {
+                        Log.d("bootpay", "confirm: " + data);
+//                        Bootpay.transactionConfirm(data); //재고가 있어서 결제를 진행하려 할때 true (방법 1)
+                        return true; //재고가 있어서 결제를 진행하려 할때 true (방법 2)
+//                        return false; //결제를 진행하지 않을때 false
+                    }
+
+                    @Override
+                    public void onDone(String data) {
+                        Log.d("done", data);
+                        removeItemAndCart();
+                    }
+                }).requestPayment();
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
