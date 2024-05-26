@@ -1,11 +1,14 @@
 package com.example.capdi2024_ver1.ui.home;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +21,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.capdi2024_ver1.R;
@@ -39,6 +43,8 @@ public class HomeFragment extends Fragment {
     private RequestQueue requestQueue;
     private ProductAdapter productAdapter;
     private SalesDataAdapter salesDataAdapter;
+
+    private String url = "http://3.35.9.191/test5.php";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -94,7 +100,57 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // Initialize Volley request queue
+        requestQueue = Volley.newRequestQueue(requireContext());
+        fetchTopSellingProduct(); // Add this line to fetch and log top selling product
         return root;
+    }
+
+    private void fetchTopSellingProduct() {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            String topSellingProductName = "";
+                            int maxSales = 0;
+
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject jsonObject = response.getJSONObject(i);
+                                String name = jsonObject.getString("name");
+                                int salesPerMonth = jsonObject.getInt("salespermonth");
+
+                                if (salesPerMonth > maxSales) {
+                                    maxSales = salesPerMonth;
+                                    topSellingProductName = name;
+                                }
+                            }
+
+                            // Set the top selling product to the banner
+                            if (binding != null) {
+                                TextView recommendedBanner = binding.textRecommendedBanner;
+                                recommendedBanner.setText("오늘 가장 많이 팔린 제품: " + topSellingProductName);
+                                recommendedBanner.setVisibility(View.VISIBLE);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Error parsing JSON data", e);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Error fetching data", error);
+                    }
+                }
+        );
+
+        requestQueue.add(jsonArrayRequest);
     }
 
     private void fetchItemDataByCategory(String category) {

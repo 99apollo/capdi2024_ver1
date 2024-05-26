@@ -12,6 +12,18 @@
         android:orientation="vertical"
         android:padding="8dp">
 
+        <!-- 추천 상품 배너 -->
+        <TextView
+            android:id="@+id/text_recommended_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:background="#FFEB3B"
+            android:padding="10dp"
+            android:text="다른 사람들이 많이 구매한 제품 : "
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
         <!-- SearchView for product search -->
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchView"
@@ -66,16 +78,16 @@
             android:layout_weight="1"
             android:layout_marginTop="8dp" />
 
-
         <!-- TextView for displaying popular/sale products -->
         <TextView
-            android:id="@+id/text_home"
+            android:id="@+id/text_home_ad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="추천 상품(인기)/세일 상품"
             android:textAlignment="center"
             android:textSize="20sp" />
+
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,7 +97,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
 
                 <Button
                     android:id="@+id/button_category00"
