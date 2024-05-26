@@ -1,5 +1,9 @@
 package com.example.capdi2024_ver1;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -24,6 +28,11 @@ public class SharedViewModel extends ViewModel {
         userName = new MutableLiveData<>();
         userEmail = new MutableLiveData<>();
         purchases = new MutableLiveData<>();
+
+        Log.d(TAG, "ViewModel Constructor - ID: " + userId.getValue());
+        Log.d(TAG, "ViewModel Constructor - Name: " + userName.getValue());
+        Log.d(TAG, "ViewModel Constructor - Email: " + userEmail.getValue());
+        Log.d(TAG, "ViewModel Constructor - Purchases: " + purchases.toString());
     }
 
     public SharedViewModel(String id, String name, String email, List<Purchase> purchases) {
@@ -32,11 +41,20 @@ public class SharedViewModel extends ViewModel {
         setUserName(name);
         setUserEmail(email);
         this.purchases.setValue(purchases);
+
+        Log.d(TAG, "ViewModel Constructor - ID: " + id);
+        Log.d(TAG, "ViewModel Constructor - Name: " + name);
+        Log.d(TAG, "ViewModel Constructor - Email: " + email);
+        Log.d(TAG, "ViewModel Constructor - Purchases: " + purchases.toString());
+
     }
 
     public void setUserId(String id) {
         userId.setValue(id);
-        fetchPurchases(id);
+        Log.d(TAG, "setUserId - ID: " + this.userId.getValue());
+        if (id != null) {
+            fetchPurchases(id);
+        }
     }
 
     public LiveData<String> getUserId() {
@@ -44,7 +62,9 @@ public class SharedViewModel extends ViewModel {
     }
 
     public void setUserName(String name) {
+
         userName.setValue(name);
+        Log.d(TAG, "setUserName - Name: " + this.userName.getValue());
     }
 
     public LiveData<String> getUserName() {
@@ -53,12 +73,17 @@ public class SharedViewModel extends ViewModel {
 
     public void setUserEmail(String email) {
         userEmail.setValue(email);
+        Log.d(TAG, "setUserEmail - Email: " + this.userEmail.getValue());
     }
 
     public LiveData<String> getUserEmail() {
         return userEmail;
     }
 
+    public void setPurchases(List<Purchase> purchases) {
+        this.purchases.setValue(purchases);
+        Log.d(TAG, "setPurchases - Purchases: " + this.purchases.getValue().toString());
+    }
     public LiveData<List<Purchase>> getPurchases() {
         return purchases;
     }

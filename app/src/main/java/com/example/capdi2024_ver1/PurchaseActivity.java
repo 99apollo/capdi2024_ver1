@@ -24,7 +24,7 @@ public class PurchaseActivity extends AppCompatActivity {
         String purchaseId = databaseReference.child(userId).child("purchases").push().getKey();
 
         if (purchaseId != null) {
-            Purchase purchase = new Purchase(purchaseId, itemName, price, date);
+            Purchase purchase = new Purchase(date, purchaseId, itemName, price);
             databaseReference.child(userId).child("purchases").child(purchaseId).setValue(purchase)
                     .addOnSuccessListener(aVoid -> {
                         // 구매 내역 추가 성공 시 처리

@@ -56,10 +56,16 @@ public class LoginActivity extends AppCompatActivity {
                         List<Purchase> purchaseList = new ArrayList<>(purchaseMap.values());
 
                         // ViewModel에 사용자 정보 설정
-                        SharedViewModel sharedViewModel = new ViewModelProvider((AppCompatActivity) context, new SharedViewModelFactory(
-                                user.getId(), user.getUsername(), user.getEmail(), purchaseList)).get(SharedViewModel.class);
+                        SharedViewModel sharedViewModel = new ViewModelProvider((AppCompatActivity) context).get(SharedViewModel.class);
+                        sharedViewModel.setUserId(userId);
+                        sharedViewModel.setUserName(username);
+                        sharedViewModel.setUserEmail(email);
+                        sharedViewModel.setPurchases(purchaseList);
 
-                        Log.d(TAG, "username : " + user.getUsername());
+                        Log.d(TAG, "ViewModel ID: " + sharedViewModel.getUserId());
+                        Log.d(TAG, "ViewModel Name: " + sharedViewModel.getUserName().getValue());
+                        Log.d(TAG, "ViewModel Email: " + sharedViewModel.getUserEmail().getValue());
+
                         break;
                     }
                 }
@@ -87,7 +93,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private static class SharedViewModelFactory implements ViewModelProvider.Factory {
         private final String id;

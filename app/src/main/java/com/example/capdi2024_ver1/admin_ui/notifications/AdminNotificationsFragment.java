@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.helper.widget.MotionEffect;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,6 +25,8 @@ public class AdminNotificationsFragment extends Fragment {
     private FragmentAdminNotificationsBinding binding;
     private SharedViewModel sharedViewModel;
     private String userId;  // 전달받은 userId를 저장할 필드
+    private String userName;  // 전달받은 userId를 저장할 필드
+    private String userEmail;  // 전달받은 userId를 저장할 필드
     private DatabaseReference itemListRef;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,6 +49,23 @@ public class AdminNotificationsFragment extends Fragment {
                 Log.d(TAG, "idin: " + userId);
             }
         });
+
+
+//        sharedViewModel.getUserName().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(String newuserName) {
+//                userName = newuserName;
+//                Log.d(MotionEffect.TAG, "user Id : " +userName);
+//            }
+//        });
+//
+//        sharedViewModel.getUserEmail().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(String newuserEmail) {
+//                userEmail = newuserEmail;
+//                Log.d(MotionEffect.TAG, "user Id : " +userEmail);
+//            }
+//        });
         return root;
     }
 

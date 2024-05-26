@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.helper.widget.MotionEffect;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
@@ -75,7 +76,24 @@ public class DashboardFragment extends Fragment {
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         Button disconnet_Button = requireActivity().findViewById(R.id.disconnect_button);
         disconnet_Button.setVisibility(View.VISIBLE);
+    // Log initial values
+        if (sharedViewModel.getUserId().getValue() != null) {
+            Log.d(MotionEffect.TAG, "Dashboard ViewModel ID: " + sharedViewModel.getUserId().getValue());
+        } else {
+            Log.d(MotionEffect.TAG, "Dashboard ViewModel ID: null");
+        }
 
+        if (sharedViewModel.getUserName().getValue() != null) {
+            Log.d(MotionEffect.TAG, "Dashboard ViewModel Name: " + sharedViewModel.getUserName().getValue());
+        } else {
+            Log.d(MotionEffect.TAG, "Dashboard ViewModel Name: null");
+        }
+
+        if (sharedViewModel.getUserEmail().getValue() != null) {
+            Log.d(MotionEffect.TAG, "Dashboard ViewModel Email: " + sharedViewModel.getUserEmail().getValue());
+        } else {
+            Log.d(MotionEffect.TAG, "Dashboard ViewModel Email: null");
+        }
         sharedViewModel.getUserId().observe(getViewLifecycleOwner(), new Observer<String>() {  // `LiveData` 관찰
             @Override
             public void onChanged(String newUserId) {
@@ -85,6 +103,7 @@ public class DashboardFragment extends Fragment {
                 checkAndRequestCartId(userId);
             }
         });
+
 
         disconnet_Button.setOnClickListener(new View.OnClickListener() {
             @Override

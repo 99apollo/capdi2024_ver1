@@ -5,11 +5,11 @@ public class Purchase {
     private String itemName;
     private int price;
 
-    public Purchase() {
-        // Default constructor required for calls to DataSnapshot.getValue(Purchase.class)
-    }
+    // 생성자, getter 및 setter
 
-    public Purchase(String itemID, String itemName, int price,String date) {
+    public Purchase() {}
+
+    public Purchase(String date, String itemID, String itemName, int price) {
         this.date = date;
         this.itemID = itemID;
         this.itemName = itemName;
@@ -46,5 +46,15 @@ public class Purchase {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Purchase{" +
+                "date='" + date + '\'' +
+                ", itemID='" + itemID + '\'' +
+                ", itemName='" + itemName + '\'' +
+                ", price=" + price +
+                '}';
     }
 }
