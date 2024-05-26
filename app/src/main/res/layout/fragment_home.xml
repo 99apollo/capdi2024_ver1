@@ -1,83 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <!-- SearchView for product search -->
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/searchView"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:orientation="vertical"
+        android:padding="8dp">
 
-    <!-- Horizontal ScrollView for category buttons -->
-    <HorizontalScrollView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <!-- SearchView for product search -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_margin="8dp" />
 
-            <Button
-                android:id="@+id/button_category1"
+        <!-- Horizontal ScrollView for category buttons -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="신선식품" />
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_category2"
-                android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/button_category1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="신선식품" />
+
+                <Button
+                    android:id="@+id/button_category2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="냉동식품" />
+
+                <Button
+                    android:id="@+id/button_category3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="가공식품" />
+
+                <Button
+                    android:id="@+id/button_category4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="기타" />
+
+                <!-- Add more buttons as needed -->
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- RecyclerView for displaying products -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_products"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp" />
+
+
+        <!-- TextView for displaying popular/sale products -->
+        <TextView
+            android:id="@+id/text_home"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="추천 상품(인기)/세일 상품"
+            android:textAlignment="center"
+            android:textSize="20sp" />
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="냉동식품" />
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_category3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="가공식품" />
 
-            <Button
-                android:id="@+id/button_category4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="기타" />
+                <Button
+                    android:id="@+id/button_category00"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="전체제품" />
 
-            <!-- Add more buttons as needed -->
-        </LinearLayout>
-    </HorizontalScrollView>
+                <Button
+                    android:id="@+id/button_category10"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="신선식품" />
 
-    <!-- RecyclerView for displaying products -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_products"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/text_home" />
+                <Button
+                    android:id="@+id/button_category20"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="냉동식품" />
 
-    <!-- TextView for displaying popular/sale products -->
-    <TextView
-        android:id="@+id/text_home"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:text="추천 상품(인기)/세일 상품"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <Button
+                    android:id="@+id/button_category30"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="가공식품" />
+
+                <Button
+                    android:id="@+id/button_category40"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="기타" />
+
+                <!-- Add more buttons as needed -->
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_recomand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</ScrollView>
