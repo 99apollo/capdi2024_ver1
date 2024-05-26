@@ -1,0 +1,70 @@
+package com.example.capdi2024_ver1.ui.home;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.capdi2024_ver1.R;
+import com.example.capdi2024_ver1.admin_ui.dashboard.ItemData;
+import java.util.List;
+
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
+
+    private List<ItemData> itemList;
+
+    public ProductAdapter(List<ItemData> itemList) {
+        this.itemList = itemList;
+    }
+
+    public void updateItemList(List<ItemData> itemList) {
+        this.itemList = itemList;
+        notifyDataSetChanged();
+    }
+
+    public void setItems(List<ItemData> itemList) {
+        this.itemList = itemList;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        ItemData item = itemList.get(position);
+        holder.bind(item);
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView itemNameTextView;
+        private TextView itemPriceTextView;
+        private TextView itemLocationTextView;
+
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            itemNameTextView = itemView.findViewById(R.id.itemNameTextView);
+            itemPriceTextView = itemView.findViewById(R.id.itemPriceTextView);
+            itemLocationTextView = itemView.findViewById(R.id.itemLocationTextView);
+        }
+
+        void bind(ItemData item) {
+            itemNameTextView.setText(item.getName());
+            itemPriceTextView.setText(String.valueOf(item.getPrice()));
+            itemLocationTextView.setText(item.getLocation());
+        }
+    }
+}
+
+
