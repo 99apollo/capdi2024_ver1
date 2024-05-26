@@ -109,8 +109,12 @@ public class ClientMainPage extends AppCompatActivity {
         // Intent로부터 데이터 받기
         Intent intent = getIntent();
         String userId = intent.getStringExtra("userId");
+        String userName = intent.getStringExtra("userName");
+        String userEmail = intent.getStringExtra("userEmail");
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);  // `SharedViewModel` 가져오기
         sharedViewModel.setUserId(userId);
+        sharedViewModel.setUserName(userName);
+        sharedViewModel.setUserEmail(userEmail);
 
         cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
 
