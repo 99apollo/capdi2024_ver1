@@ -47,6 +47,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.lifecycle.ViewModelProvider;
+import com.example.capdi2024_ver1.ClientMainPage;
 public class DashboardFragment extends Fragment {
 
     private RecyclerView recyclerView;
@@ -143,7 +144,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void run() {
                 sendHttpRequest(cartID); // HTTP 요청 수행
-                handler.postDelayed(this, 10000); // 10초 후에 다시 실행
+                handler.postDelayed(this, 5000); // 10초 후에 다시 실행
                 Log.e(TAG, "test" + cartID);
             }
         };
@@ -200,6 +201,7 @@ public class DashboardFragment extends Fragment {
                                             Toast.makeText(requireActivity(), "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
                                             Button disconnet = requireActivity().findViewById(R.id.disconnect_button);
                                             stopPeriodicFetching();
+
                                             disconnet.setText("connect");
                                         }
                                     });
@@ -364,10 +366,11 @@ public class DashboardFragment extends Fragment {
                 if (cartId.equals(inCartId)) {
                     if (price != null && !price.isEmpty()) {
                         int priceInt = Integer.parseInt(price);
+                        int countInt=Integer.parseInt(count);
                         CartItem cartItem = new CartItem(cartId, itemId, itemValue, count, String.valueOf(priceInt));
                         cartItems.add(cartItem);
-                        total_cost += priceInt;
-                        temp++;
+                        total_cost += priceInt*countInt;
+                        temp+=countInt;
                     }
                 }
             }

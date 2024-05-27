@@ -233,11 +233,8 @@ public class ClientMainPage extends AppCompatActivity {
         bluetoothDiscoveryRunnable = new Runnable() {
             @Override
             public void run() {
-                if(cart_ID != null){
-                    doBluetoothDiscovery();
-                }
-
-                handler.postDelayed(this, 3000); // 4초마다 실행 (2초 스캔 + 2초 대기)
+                doBluetoothDiscovery();
+                handler.postDelayed(this, 12000); // 4초마다 실행 (2초 스캔 + 2초 대기)
             }
         };
         handler.post(bluetoothDiscoveryRunnable);
@@ -300,7 +297,7 @@ public class ClientMainPage extends AppCompatActivity {
     private void startBluetoothScanning() {
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         if (bluetoothLeScanner != null) {
-            // 2초 동안 스캔
+            // 4초 동안 스캔
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -316,7 +313,7 @@ public class ClientMainPage extends AppCompatActivity {
                     }
                     bluetoothLeScanner.stopScan(leScanCallback);
                 }
-            }, 2000);
+            }, 4000);
             bluetoothLeScanner.startScan(leScanCallback);
         }
     }
@@ -341,7 +338,7 @@ public class ClientMainPage extends AppCompatActivity {
             String deviceName = device.getName();
             String deviceAddress = device.getAddress();
             Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress);
-            if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
+            if ("5F:58:1B:E1:7D:39".equals(deviceAddress)) {
                 showFingerprintDialog(ClientMainPage.this);
                 stopBluetoothDiscovery();
             }
@@ -431,11 +428,18 @@ public class ClientMainPage extends AppCompatActivity {
                                             Toast.makeText(ClientMainPage.this, "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
                                             Button disconnect = findViewById(R.id.disconnect_button);
                                             disconnect.setText("connect");
+                                            // 현재 액티비티를 재시작
+                                            Intent intent = getIntent();
+                                            finish();
+                                            overridePendingTransition(0, 0); // 애니메이션 없이 전환
+                                            startActivity(intent);
+                                            overridePendingTransition(0, 0); // 애니메이션 없이 전환
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.e(TAG, "연결 카트 check 초기화 실패 ");
+                                            startBluetoothDiscoveryWithInterval();
                                         }
                                     });
                                 }
@@ -443,6 +447,7 @@ public class ClientMainPage extends AppCompatActivity {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     Log.e(TAG, "연결 카트 리스트 초기화 실패 ");
+                                    startBluetoothDiscoveryWithInterval();
                                 }
                             });
                         }
@@ -464,85 +469,101 @@ public class ClientMainPage extends AppCompatActivity {
         BootUser user = new BootUser().setPhone("010-1234-5678"); // 구매자 정보
 
         BootExtra extra = new BootExtra().setCardQuota("0,2,3"); // 일시불, 2개월, 3개월 할부 허용
-        Log.e(TAG, "Cart ID before pay: " + cart_ID);
-        if (cart_ID != null) {
-            fetchCartItems("http://3.35.9.191/test2.php?username=app&password=app2024&cart_id=" + cart_ID, new OnCartItemsFetchedListener() {
-                @Override
-                public void onCartItemsFetched(List<CartItem> cartItems) {
-                    Log.e(TAG, "List check complete");
-                    // cartItems 데이터를 사용하여 결제 요청을 시작합니다.
-                    if (cartItems == null || cartItems.isEmpty()) {
-                        Toast.makeText(ClientMainPage.this, "장바구니가 비어 있습니다.", Toast.LENGTH_LONG).show();
-                        return;
+        cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
+        Intent intent = getIntent();
+        String userId = intent.getStringExtra("userId");
+        cartListRef.child(userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot dataSnapshot = task.getResult();
+                if (dataSnapshot.exists()) {
+                    cart_ID = dataSnapshot.child("cart_id").getValue().toString();
+                    Log.e(TAG, "Cart ID before pay: " + cart_ID);
+                    if (cart_ID != null) {
+                        fetchCartItems("http://3.35.9.191/test2.php?username=app&password=app2024&cart_id=" + cart_ID, new OnCartItemsFetchedListener() {
+                            @Override
+                            public void onCartItemsFetched(List<CartItem> cartItems) {
+                                Log.e(TAG, "List check complete");
+                                // cartItems 데이터를 사용하여 결제 요청을 시작합니다.
+                                if (cartItems == null || cartItems.isEmpty()) {
+                                    Toast.makeText(ClientMainPage.this, "장바구니가 비어 있습니다.", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                List<BootItem> bootItems = new ArrayList<>();
+                                for (CartItem cartItem : cartItems) {
+                                    BootItem bootItem = new BootItem()
+                                            .setName(cartItem.getName())
+                                            .setId(cartItem.getItemValue())
+                                            .setQty(cartItem.getCount())
+                                            .setPrice((double) cartItem.getPrice());
+                                    bootItems.add(bootItem);
+                                }
+
+                                Payload payload = new Payload();
+                                payload.setApplicationId("664d8baebc174e41fa1e1187") //고정 ID
+                                        .setOrderName("부트페이 결제테스트")
+                                        .setPg("카카오페이") //고정 결제 업체
+                                        .setMethod("") //고정 결제 수단
+                                        .setOrderId("1234")
+                                        .setPrice(calculateTotalPrice(cartItems)) // 장바구니 총 가격
+                                        .setUser(user)
+                                        .setExtra(extra)
+                                        .setItems(bootItems);
+
+                                Map<String, Object> map = new HashMap<>();
+                                payload.setMetadata(map);
+
+                                Bootpay.init(getSupportFragmentManager(), getApplicationContext())
+                                        .setPayload(payload)
+                                        .setEventListener(new BootpayEventListener() {
+                                            @Override
+                                            public void onCancel(String data) {
+                                                Log.d("bootpay", "cancel: " + data);
+                                                startBluetoothDiscoveryWithInterval();
+                                            }
+
+                                            @Override
+                                            public void onError(String data) {
+                                                Log.d("bootpay", "error: " + data);
+                                                startBluetoothDiscoveryWithInterval();
+                                            }
+
+                                            @Override
+                                            public void onClose() {
+                                                Bootpay.removePaymentWindow();
+                                                startBluetoothDiscoveryWithInterval();
+                                            }
+
+                                            @Override
+                                            public void onIssued(String data) {
+                                                Log.d("bootpay", "issued: " + data);
+                                            }
+
+                                            @Override
+                                            public boolean onConfirm(String data) {
+                                                Log.d("bootpay", "confirm: " + data);
+                                                return true; //재고가 있어서 결제를 진행하려 할때 true
+                                            }
+
+                                            @Override
+                                            public void onDone(String data) {
+                                                Log.d("done", data);
+                                                removeItemAndCart();
+                                            }
+                                        }).requestPayment();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(this, "카트 번호 확인 실패", Toast.LENGTH_LONG).show();
                     }
-
-                    List<BootItem> bootItems = new ArrayList<>();
-                    for (CartItem cartItem : cartItems) {
-                        BootItem bootItem = new BootItem()
-                                .setName(cartItem.getName())
-                                .setId(cartItem.getItemValue())
-                                .setQty(cartItem.getCount())
-                                .setPrice((double) cartItem.getPrice());
-                        bootItems.add(bootItem);
-                    }
-
-                    Payload payload = new Payload();
-                    payload.setApplicationId("664d8baebc174e41fa1e1187") //고정 ID
-                            .setOrderName("부트페이 결제테스트")
-                            .setPg("카카오페이") //고정 결제 업체
-                            .setMethod("") //고정 결제 수단
-                            .setOrderId("1234")
-                            .setPrice(calculateTotalPrice(cartItems)) // 장바구니 총 가격
-                            .setUser(user)
-                            .setExtra(extra)
-                            .setItems(bootItems);
-
-                    Map<String, Object> map = new HashMap<>();
-                    payload.setMetadata(map);
-
-                    Bootpay.init(getSupportFragmentManager(), getApplicationContext())
-                            .setPayload(payload)
-                            .setEventListener(new BootpayEventListener() {
-                                @Override
-                                public void onCancel(String data) {
-                                    Log.d("bootpay", "cancel: " + data);
-                                    startBluetoothDiscoveryWithInterval();
-                                }
-
-                                @Override
-                                public void onError(String data) {
-                                    Log.d("bootpay", "error: " + data);
-                                    startBluetoothDiscoveryWithInterval();
-                                }
-
-                                @Override
-                                public void onClose() {
-                                    Bootpay.removePaymentWindow();
-                                    startBluetoothDiscoveryWithInterval();
-                                }
-
-                                @Override
-                                public void onIssued(String data) {
-                                    Log.d("bootpay", "issued: " + data);
-                                }
-
-                                @Override
-                                public boolean onConfirm(String data) {
-                                    Log.d("bootpay", "confirm: " + data);
-                                    return true; //재고가 있어서 결제를 진행하려 할때 true
-                                }
-
-                                @Override
-                                public void onDone(String data) {
-                                    Log.d("done", data);
-                                    removeItemAndCart();
-                                }
-                            }).requestPayment();
+                } else {
+                    Toast.makeText(this,"결제 전 카트 확인 실패",Toast.LENGTH_SHORT).show();
                 }
-            });
-        } else {
-            Toast.makeText(this, "카트 번호 확인 실패", Toast.LENGTH_LONG).show();
-        }
+            } else {
+                // Firebase에서 오류가 발생했을 때 처리
+            }
+        });
+
     }
 
     private double calculateTotalPrice(List<CartItem> items) {
@@ -552,7 +573,6 @@ public class ClientMainPage extends AppCompatActivity {
         }
         return total;
     }
-
 
 
 
