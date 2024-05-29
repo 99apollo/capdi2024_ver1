@@ -20,8 +20,10 @@ import com.example.capdi2024_ver1.PurchaseAdapter;
 import com.example.capdi2024_ver1.R;
 import com.example.capdi2024_ver1.SharedViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class NotificationsFragment extends Fragment {
@@ -29,6 +31,8 @@ public class NotificationsFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private PurchaseAdapter purchaseAdapter;
     private List<Purchase> allPurchases = new ArrayList<>();
+    private TextView totalAmountTextView;
+    private CalendarView calendarView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,7 +49,8 @@ public class NotificationsFragment extends Fragment {
         final TextView userNameTextView = view.findViewById(R.id.user_name_text_view);
         final TextView userEmailTextView = view.findViewById(R.id.user_email_text_view);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        CalendarView calendarView = view.findViewById(R.id.calendar_view);
+        calendarView = view.findViewById(R.id.calendar_view);
+        totalAmountTextView = view.findViewById(R.id.total_amount_text_view);
 
         // Initialize ViewModel
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -104,7 +109,12 @@ public class NotificationsFragment extends Fragment {
             public void onChanged(List<Purchase> purchases) {
                 Log.d(TAG, "Observed Purchases: " + purchases.toString());
                 allPurchases = purchases;
-                purchaseAdapter.setPurchases(purchases);
+                // Show purchases for today's date
+                String todayDate = getTodayDate();
+                List<Purchase> purchasesForToday = getPurchasesForDate(todayDate);
+                purchaseAdapter.setPurchases(purchasesForToday);
+                int totalAmount = calculateTotalAmount(purchasesForToday);
+                totalAmountTextView.setText("Total Amount: " + totalAmount);
             }
         });
 
@@ -113,7 +123,12 @@ public class NotificationsFragment extends Fragment {
             String selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
             List<Purchase> purchasesForSelectedDate = getPurchasesForDate(selectedDate);
             purchaseAdapter.setPurchases(purchasesForSelectedDate);
+            int totalAmount = calculateTotalAmount(purchasesForSelectedDate);
+            totalAmountTextView.setText("Total Amount: " + totalAmount);
         });
+
+        // Set CalendarView date to today
+        setTodayAsDefaultDate();
     }
 
     private List<Purchase> getPurchasesForDate(String date) {
@@ -124,5 +139,25 @@ public class NotificationsFragment extends Fragment {
             }
         }
         return purchasesForDate;
+    }
+
+    private int calculateTotalAmount(List<Purchase> purchases) {
+        int totalAmount = 0;
+        for (Purchase purchase : purchases) {
+            totalAmount += purchase.getPrice();
+        }
+        return totalAmount;
+    }
+
+    private void setTodayAsDefaultDate() {
+        Calendar calendar = Calendar.getInstance();
+        long today = calendar.getTimeInMillis();
+        calendarView.setDate(today, false, true);
+    }
+
+    private String getTodayDate() {
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(today);
     }
 }
