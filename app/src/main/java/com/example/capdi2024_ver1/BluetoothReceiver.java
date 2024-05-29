@@ -14,8 +14,8 @@ import android.widget.Toast;
 
 public class BluetoothReceiver extends BroadcastReceiver {
     // 특정 블루투스 기기의 MAC 주소
-    private static final String TARGET_DEVICE_MAC_ADDRESS = "64:03:7F:A8:E8:F7"; // 예시 MAC 주소
-
+    private static final String TARGET_DEVICE_MAC_ADDRESS = "98:DA:60:02:B8:83"; // 예시 MAC 주소
+    //98:DA:60:02:B8:83
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();

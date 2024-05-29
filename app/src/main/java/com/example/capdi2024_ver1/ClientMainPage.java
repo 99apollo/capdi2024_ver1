@@ -54,9 +54,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -87,6 +90,7 @@ public class ClientMainPage extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     private DatabaseReference cartListCheckRef;
+    private DatabaseReference userPurchasesRef;
 
     private List<CartItem> cartItems = new ArrayList<>();
     private RequestQueue requestQueue;
@@ -123,8 +127,9 @@ public class ClientMainPage extends AppCompatActivity {
         sharedViewModel.setUserEmail(userEmail);
 
         cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
-
         cartListCheckRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
+        userPurchasesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("purchases");
+
         // `Activity`에서 `NavController`를 사용하여 목적지 변경을 감지
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
@@ -338,7 +343,7 @@ public class ClientMainPage extends AppCompatActivity {
             String deviceName = device.getName();
             String deviceAddress = device.getAddress();
             Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress);
-            if ("5F:58:1B:E1:7D:39".equals(deviceAddress)) {
+            if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
                 showFingerprintDialog(ClientMainPage.this);
                 stopBluetoothDiscovery();
             }
@@ -548,6 +553,7 @@ public class ClientMainPage extends AppCompatActivity {
                                             @Override
                                             public void onDone(String data) {
                                                 Log.d("done", data);
+                                                savePurchasesToFirebase(cartItems);
                                                 removeItemAndCart();
                                             }
                                         }).requestPayment();
@@ -566,6 +572,26 @@ public class ClientMainPage extends AppCompatActivity {
 
     }
 
+    private void savePurchasesToFirebase(List<CartItem> cartItems) {
+        String userId = sharedViewModel.getUserId().getValue();
+        DatabaseReference userPurchasesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("purchases");
+
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        for (CartItem cartItem : cartItems) {
+            String purchaseId = userPurchasesRef.push().getKey(); // 새로운 키 생성
+            Purchase purchase = new Purchase(currentDate, cartItem.getItemValue(), cartItem.getName(), cartItem.getPrice());
+            if (purchaseId != null) {
+                userPurchasesRef.child(purchaseId).setValue(purchase).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Purchase saved successfully");
+                    } else {
+                        Log.e(TAG, "Failed to save purchase", task.getException());
+                    }
+                });
+            }
+        }
+    }
+
     private double calculateTotalPrice(List<CartItem> items) {
         double total = 0;
         for (CartItem item : items) {
@@ -573,8 +599,6 @@ public class ClientMainPage extends AppCompatActivity {
         }
         return total;
     }
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
