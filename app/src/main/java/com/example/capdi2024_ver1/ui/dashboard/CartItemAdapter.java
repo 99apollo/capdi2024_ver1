@@ -33,7 +33,6 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         CartItem cartItem = cartItems.get(position);
         holder.cartIdTextView.setText("price : " + cartItem.getPrice());
         holder.itemIdTextView.setText("Item ID: " + cartItem.getItemId());
-        holder.itemValueTextView.setText("Item Value: " + cartItem.getItemValue());
         holder.itemCountTextView.setText("count: "+cartItem.getCount());
     }
 
@@ -52,7 +51,6 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
             super(itemView);
             cartIdTextView = itemView.findViewById(R.id.cart_id);
             itemIdTextView = itemView.findViewById(R.id.item_id);
-            itemValueTextView = itemView.findViewById(R.id.item_value);
             itemCountTextView = itemView.findViewById(R.id.item_count);
         }
     }
