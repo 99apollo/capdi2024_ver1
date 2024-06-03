@@ -472,7 +472,6 @@ public class ClientMainPage extends AppCompatActivity {
     public void Payment(View v) {
         stopBluetoothDiscovery();
         BootUser user = new BootUser().setPhone("010-1234-5678"); // 구매자 정보
-
         BootExtra extra = new BootExtra().setCardQuota("0,2,3"); // 일시불, 2개월, 3개월 할부 허용
         cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
         Intent intent = getIntent();

@@ -62,7 +62,7 @@ public class SalesDataAdapter extends RecyclerView.Adapter<SalesDataAdapter.View
             itemNameRank = itemView.findViewById(R.id.itemNamerank);
             itemPriceRank = itemView.findViewById(R.id.itemPricerank);
             salenumrank = itemView.findViewById(R.id.salenumrank);
-
+            itemImage=itemView.findViewById(R.id.item_Image);
         }
 
         void bind(SalesData salesData) {

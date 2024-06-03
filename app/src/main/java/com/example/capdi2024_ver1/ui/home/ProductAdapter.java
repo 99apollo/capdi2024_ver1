@@ -3,6 +3,7 @@ package com.example.capdi2024_ver1.ui.home;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,12 +52,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         private TextView itemNameTextView;
         private TextView itemPriceTextView;
         private TextView itemLocationTextView;
+        private ImageView itemImageView;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemNameTextView = itemView.findViewById(R.id.itemNameTextView);
             itemPriceTextView = itemView.findViewById(R.id.itemPriceTextView);
             itemLocationTextView = itemView.findViewById(R.id.itemLocationTextView);
+            itemImageView=itemView.findViewById(R.id.item_Image);
         }
 
         void bind(ItemData item) {
