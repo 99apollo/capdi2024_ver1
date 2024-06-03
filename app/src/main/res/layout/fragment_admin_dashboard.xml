@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".admin_ui.dashboard.AdminDashboardFragment">
 
     <!-- Text at the top -->
@@ -13,10 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
-        android:textSize="20sp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="24sp"
+        android:textStyle="bold"
         android:text="재고 현황 / 카트 유저 현황"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/text_admin_dashboard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -34,13 +38,15 @@
             android:id="@+id/radioButton1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="재고 현황" />
+            android:text="재고 현황"
+            android:textColor="@color/primaryTextColor" />
 
         <RadioButton
             android:id="@+id/radioButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="카트 현황" />
+            android:text="카트 현황"
+            android:textColor="@color/primaryTextColor" />
     </RadioGroup>
 
     <!-- ChipGroup initially hidden -->
@@ -48,6 +54,7 @@
         android:id="@+id/chipGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/radioGroup"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,26 +64,33 @@
             android:id="@+id/chip1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="신선식품" />
+            android:text="신선식품"
+            app:chipBackgroundColor="@color/Orange"
+            android:textColor="@color/white" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="냉동식품" />
+            android:text="냉동식품"
+            app:chipBackgroundColor="@color/Orange"
+            android:textColor="@color/white" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="가공식품" />
+            android:text="가공식품"
+            app:chipBackgroundColor="@color/Orange"
+            android:textColor="@color/white" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="기타" />
-
+            android:text="기타"
+            app:chipBackgroundColor="@color/Orange"
+            android:textColor="@color/white" />
     </com.google.android.material.chip.ChipGroup>
 
     <!-- TableLayout for displaying cart check items -->
@@ -84,6 +98,7 @@
         android:id="@+id/tableLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/chipGroup"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,9 +109,10 @@
         android:id="@+id/admin_dashboard_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+        app:layout_constraintTop_toBottomOf="@id/chipGroup" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
