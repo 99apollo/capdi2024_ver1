@@ -288,6 +288,7 @@ public class DashboardFragment extends Fragment {
                         // cart 사용자 없을시
                         cartListRef.child(userId).child("cart_id").setValue(cartId);
                         cartListCheckRef.child(cartId).setValue(userId);
+                        Toast.makeText(requireActivity(), "카트 "+cartId+"번 연결", Toast.LENGTH_LONG).show();
                         Button button1 = requireActivity().findViewById(R.id.disconnect_button);
                         button1.setText("disconnect");
                         loadCartItems(cartId);

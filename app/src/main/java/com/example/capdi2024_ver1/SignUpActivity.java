@@ -111,6 +111,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             Toast.makeText(SignUpActivity.this, "이메일로 인증 링크가 전송되었습니다.", Toast.LENGTH_LONG).show();
                                             // 이메일 인증 버튼 활성화
                                             buttonVerifyEmail.setEnabled(true);
+                                            buttonVerifyEmail.setVisibility(View.VISIBLE);
                                         } else {
                                             Toast.makeText(SignUpActivity.this, "이메일 인증 링크 전송에 실패했습니다.", Toast.LENGTH_LONG).show();
                                         }
