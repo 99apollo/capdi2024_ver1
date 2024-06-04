@@ -286,7 +286,13 @@ public class ClientMainPage extends AppCompatActivity {
                     String cartId = dataSnapshot.child("cart_id").getValue(String.class);
                     if (cartId != null && !cartId.isEmpty()) {
                         Log.e(TAG, "cart 인식 성공 블루투스 시작 " + cartId);
-                        startBluetoothScanning();
+                        fetchCartItems("http://3.35.9.191/test2.php?username=app&password=app2024&cart_id=" + cartId, new OnCartItemsFetchedListener() {
+                            @Override
+                            public void onCartItemsFetched(List<CartItem> cartItems) {
+                                startBluetoothScanning();;
+                            }
+                        });
+                        //startBluetoothScanning();
                     } else {
                         Log.e(TAG, "cart 연결 안됨 블루투스 멈춤 " + cartId);
                     }
@@ -463,6 +469,7 @@ public class ClientMainPage extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         // 에러 처리
                         Log.e(TAG, "Volley error: " + error.getMessage());
+                        stopBluetoothDiscovery();
                     }
                 });
 
@@ -638,6 +645,7 @@ public class ClientMainPage extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONArray response) {
                         List<CartItem> cartItems = new ArrayList<>();
+                        Log.e(TAG,"response value"+response);
                         try {
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject jsonObject = response.getJSONObject(i);
