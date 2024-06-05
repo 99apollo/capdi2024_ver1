@@ -29,7 +29,18 @@
             android:id="@+id/searchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:iconifiedByDefault="true"
+            android:queryHint="원하시는 상품을 검색해보세요"
             android:layout_margin="8dp" />
+
+        <TextView
+            android:id="@+id/text_home_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="카테고리"
+            android:textAlignment="center"
+            android:textSize="15sp" />
 
         <!-- Horizontal ScrollView for category buttons -->
         <HorizontalScrollView
@@ -42,28 +53,33 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+
                 <Button
                     android:id="@+id/button_category1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="신선식품" />
 
                 <Button
                     android:id="@+id/button_category2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="냉동식품" />
 
                 <Button
                     android:id="@+id/button_category3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="가공식품" />
 
                 <Button
                     android:id="@+id/button_category4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="기타" />
 
                 <!-- Add more buttons as needed -->
@@ -84,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="추천 상품(인기)/세일 상품"
+            android:text="베스트 상품(판매량순)"
             android:textAlignment="center"
             android:textSize="20sp" />
 
@@ -98,11 +114,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+
                 <Button
                     android:id="@+id/button_category00"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="전체제품" />
 
                 <Button
@@ -110,6 +128,7 @@
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="신선식품" />
 
                 <Button
@@ -117,6 +136,7 @@
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="냉동식품" />
 
                 <Button
@@ -124,6 +144,7 @@
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="가공식품" />
 
                 <Button
@@ -131,6 +152,7 @@
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:background="#FFC107"
                     android:text="기타" />
 
                 <!-- Add more buttons as needed -->

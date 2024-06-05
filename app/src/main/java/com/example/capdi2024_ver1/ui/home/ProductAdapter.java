@@ -59,15 +59,22 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             itemNameTextView = itemView.findViewById(R.id.itemNameTextView);
             itemPriceTextView = itemView.findViewById(R.id.itemPriceTextView);
             itemLocationTextView = itemView.findViewById(R.id.itemLocationTextView);
-            itemImageView=itemView.findViewById(R.id.item_Image);
+            itemImageView = itemView.findViewById(R.id.item_Image);
         }
 
         void bind(ItemData item) {
             itemNameTextView.setText(item.getName());
             itemPriceTextView.setText(String.valueOf(item.getPrice()));
             itemLocationTextView.setText(item.getLocation());
+
+            // 이미지 리소스를 설정합니다.
+            int resId = itemView.getContext().getResources().getIdentifier(item.getImageResource(), "drawable", itemView.getContext().getPackageName());
+            if (resId != 0) {
+                itemImageView.setImageResource(resId);
+            } else {
+                // 리소스가 없을 경우의 기본 이미지를 설정합니다.
+                itemImageView.setImageResource(R.drawable.default_image);
+            }
         }
     }
 }
-
-

@@ -29,6 +29,8 @@
             android:name=".ClientMainPage"
             android:exported="false"
             android:label="@string/title_activity_client_main_page" />
+        <activity android:name=".ui.home.SearchResultsActivity" />
+
         <activity
             android:name=".ClientPage"
             android:exported="false"

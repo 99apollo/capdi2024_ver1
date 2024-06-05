@@ -67,11 +67,13 @@ public class SalesDataAdapter extends RecyclerView.Adapter<SalesDataAdapter.View
 
         void bind(SalesData salesData) {
             textSalesRank.setText(String.valueOf(getAdapterPosition() + 1));
-            //temImage.setImageResource(salesData.getImageResource());
-            // For example:
-            // itemImage.setImageResource(salesData.getImageResource());
+
+            // 이미지 리소스를 문자열로부터 얻어서 설정합니다.
+            int imageResource = itemView.getContext().getResources().getIdentifier(salesData.getImageResource(), "drawable", itemView.getContext().getPackageName());
+            itemImage.setImageResource(imageResource);
+
             itemNameRank.setText(salesData.getName());
-            itemPriceRank.setText(String.valueOf(salesData.getPrice()));
+            itemPriceRank.setText(salesData.getPrice() + "원");
             salenumrank.setText(String.valueOf(salesData.getSalesPerDay()));
 
             // Add logging

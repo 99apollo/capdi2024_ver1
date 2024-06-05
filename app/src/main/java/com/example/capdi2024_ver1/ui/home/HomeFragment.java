@@ -1,7 +1,8 @@
 package com.example.capdi2024_ver1.ui.home;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,6 +45,7 @@ public class HomeFragment extends Fragment {
     private ProductAdapter productAdapter;
     private SalesDataAdapter salesDataAdapter;
 
+
     private String url = "http://3.35.9.191/test5.php";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -63,7 +65,6 @@ public class HomeFragment extends Fragment {
         salesDataAdapter = new SalesDataAdapter(salesDataList);
         recyclerViewSales.setAdapter(salesDataAdapter);
 
-        // Initialize buttons and set click listeners
         Button buttonCategory1 = binding.buttonCategory1;
         Button buttonCategory2 = binding.buttonCategory2;
         Button buttonCategory3 = binding.buttonCategory3;
@@ -74,28 +75,80 @@ public class HomeFragment extends Fragment {
         Button buttonCategory30 = binding.buttonCategory30;
         Button buttonCategory40 = binding.buttonCategory40;
 
-        buttonCategory1.setOnClickListener(v -> fetchItemDataByCategory("신선식품"));
-        buttonCategory2.setOnClickListener(v -> fetchItemDataByCategory("냉동식품"));
-        buttonCategory3.setOnClickListener(v -> fetchItemDataByCategory("가공식품"));
-        buttonCategory4.setOnClickListener(v -> fetchItemDataByCategory("기타"));
-        buttonCategory00.setOnClickListener(v -> fetchSalesData(""));
-        buttonCategory10.setOnClickListener(v -> fetchSalesData("신선식품"));
-        buttonCategory20.setOnClickListener(v -> fetchSalesData("냉동식품"));
-        buttonCategory30.setOnClickListener(v -> fetchSalesData("가공식품"));
-        buttonCategory40.setOnClickListener(v -> fetchSalesData("기타"));
 
-        // Initialize SearchView
+        buttonCategory1.setOnClickListener(v -> {
+            fetchItemDataByCategory("신선식품");
+            toggleRecyclerViewProductsVisibility();
+        });
+
+        buttonCategory2.setOnClickListener(v -> {
+            fetchItemDataByCategory("냉동식품");
+            toggleRecyclerViewProductsVisibility();
+        });
+
+        buttonCategory3.setOnClickListener(v -> {
+            fetchItemDataByCategory("가공식품");
+            toggleRecyclerViewProductsVisibility();
+        });
+
+        buttonCategory4.setOnClickListener(v -> {
+            fetchItemDataByCategory("기타");
+            toggleRecyclerViewProductsVisibility();
+        });
+
+        buttonCategory00.setOnClickListener(v -> {
+            fetchSalesData("");
+            toggleRecyclerViewSalesVisibility();
+        });
+
+        buttonCategory10.setOnClickListener(v -> {
+            fetchSalesData("신선식품");
+            toggleRecyclerViewSalesVisibility();
+        });
+
+        buttonCategory20.setOnClickListener(v -> {
+            fetchSalesData("냉동식품");
+            toggleRecyclerViewSalesVisibility();
+        });
+
+        buttonCategory30.setOnClickListener(v -> {
+            fetchSalesData("가공식품");
+            toggleRecyclerViewSalesVisibility();
+        });
+
+        buttonCategory40.setOnClickListener(v -> {
+            fetchSalesData("기타");
+            toggleRecyclerViewSalesVisibility();
+        });
+
+
         SearchView searchView = binding.searchView;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                filterItemData(query);
+                Log.d("HomeFragment", "onQueryTextSubmit: " + query);
+                if (!query.trim().isEmpty()) {
+                    fetchItemDataByCategory("");
+                    // Filter data based on the search query
+                    List<ItemData> filteredList = filterItemData(query);
+                    // Start SearchResultsActivity and pass the filtered data
+                    Intent intent = new Intent(requireContext(), SearchResultsActivity.class);
+                    intent.putParcelableArrayListExtra("search_results", new ArrayList<>(filteredList));
+                    startActivity(intent);
+                }
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterItemData(newText);
+                Log.d("HomeFragment", "onQueryTextChange: " + newText);
+                if (!newText.trim().isEmpty()) {
+                    filterItemData(newText);
+                } else {
+                    // 텍스트가 비어있을 경우 전체 목록을 보여주거나 다른 처리를 합니다.
+                    productAdapter.setItems(itemDataList);
+                    productAdapter.notifyDataSetChanged();
+                }
                 return true;
             }
         });
@@ -154,7 +207,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchItemDataByCategory(String category) {
-        String url = "http://3.35.9.191/home_search.php?category=" + category;
+        String url;
+        if (category == null || category.isEmpty()) {
+            url = "http://3.35.9.191/home_search.php"; // 전체 데이터를 가져오는 URL
+        } else {
+            url ="http://3.35.9.191/home_search.php?category=" + category;// 특정 카테고리의 데이터를 가져오는 URL
+        }
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -191,7 +250,7 @@ public class HomeFragment extends Fragment {
                     public void onResponse(String response) {
                         Log.d("HomeFragment", "Server Response: " + response);
                         salesDataList = parseSalesDataJson(response);
-                        updateRecyclerViewWithSalesData(salesDataList);
+                          updateRecyclerViewWithSalesData(salesDataList);
                     }
                 },
                 new Response.ErrorListener() {
@@ -222,7 +281,14 @@ public class HomeFragment extends Fragment {
                 int amount = jsonObject.getInt("amount");
                 String location = jsonObject.getString("location");
 
-                ItemData itemData = new ItemData(itemValue, category, name, manufacturer, price, amount, location);
+                // item_value의 8번째 문자를 가져와서 이미지 리소스 문자열을 설정합니다.
+                String imageResource = "";
+                if (!itemValue.isEmpty() && itemValue.length() >= 8) {
+                    char identifier = itemValue.charAt(7);
+                    imageResource = "u" + identifier;
+                }
+
+                ItemData itemData = new ItemData(itemValue, category, name, manufacturer, price, amount, location, imageResource);
                 itemList.add(itemData);
             }
         } catch (JSONException e) {
@@ -231,6 +297,7 @@ public class HomeFragment extends Fragment {
         return itemList;
     }
 
+
     private List<SalesData> parseSalesDataJson(String response) {
         List<SalesData> salesList = new ArrayList<>();
         try {
@@ -238,13 +305,21 @@ public class HomeFragment extends Fragment {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 String name = jsonObject.getString("name");
-                double price = jsonObject.getDouble("price");
-                int salesPerDay = jsonObject.getInt("salesperday");
-                int salesPerWeek = jsonObject.getInt("salesperweek");
-                int salesPerMonth = jsonObject.getInt("salespermonth");
+                String price = String.valueOf(jsonObject.getDouble("price"));
+                String salesPerDay = String.valueOf(jsonObject.getInt("salesperday"));
+                String salesPerWeek = String.valueOf(jsonObject.getInt("salesperweek"));
+                String salesPerMonth = String.valueOf(jsonObject.getInt("salespermonth"));
                 String category = jsonObject.getString("categori");
+                String itemValue = jsonObject.optString("item_value", "");
 
-                SalesData salesData = new SalesData(name, price, salesPerDay, salesPerWeek, salesPerMonth, category);
+                // item_value의 8번째 문자를 가져와서 이미지 리소스 문자열을 설정합니다.
+                String imageResource = "";
+                if (!itemValue.isEmpty() && itemValue.length() >= 8) {
+                    char identifier = itemValue.charAt(7);
+                    imageResource = "u" + identifier;
+                }
+
+                SalesData salesData = new SalesData(name, price, salesPerDay, salesPerWeek, salesPerMonth, category, itemValue, imageResource);
                 salesList.add(salesData);
             }
         } catch (JSONException e) {
@@ -252,6 +327,8 @@ public class HomeFragment extends Fragment {
         }
         return salesList;
     }
+
+
 
     private void updateRecyclerView(List<ItemData> itemList) {
         productAdapter.setItems(itemList);
@@ -261,17 +338,49 @@ public class HomeFragment extends Fragment {
         salesDataAdapter.setSalesList(salesList);
     }
 
-    private void filterItemData(String query) {
+    private void handleSearchQuery(String query) {
+        // 검색 결과를 처리하는 로직을 여기에 작성합니다.
+        List<ItemData> filteredList = filterItemData(query);
+        // 다음 화면으로 이동하는 코드를 여기에 추가합니다. (예: SearchResultsActivity를 시작하는 코드)
+        Intent intent = new Intent(requireContext(), SearchResultsActivity.class);
+        intent.putParcelableArrayListExtra("search_results", new ArrayList<>(filteredList));
+        startActivity(intent);
+    }
+
+    private List<ItemData> filterItemData(String query) {
         List<ItemData> filteredList = new ArrayList<>();
         for (ItemData item : itemDataList) {
             if (item.getName().toLowerCase().contains(query.toLowerCase())
                     || item.getManufacturer().toLowerCase().contains(query.toLowerCase())
                     || item.getCategory().equalsIgnoreCase(query)) {
                 filteredList.add(item);
+                Log.d("filterItemData", "Filtered item added: " + item.getName());
             }
         }
-        updateRecyclerView(filteredList);
+        return filteredList;
+
     }
+
+    private void toggleRecyclerViewProductsVisibility() {
+        RecyclerView recyclerViewProducts = binding.recyclerViewProducts;
+
+        if (recyclerViewProducts.getVisibility() == View.VISIBLE) {
+            recyclerViewProducts.setVisibility(View.GONE);
+        } else {
+            recyclerViewProducts.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void toggleRecyclerViewSalesVisibility() {
+        RecyclerView recyclerViewSales = binding.recyclerViewRecomand;
+
+        if (recyclerViewSales.getVisibility() == View.VISIBLE) {
+            recyclerViewSales.setVisibility(View.GONE);
+        } else {
+            recyclerViewSales.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     @Override
     public void onDestroyView() {
