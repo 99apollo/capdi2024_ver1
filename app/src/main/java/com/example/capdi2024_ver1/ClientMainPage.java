@@ -355,13 +355,14 @@ public class ClientMainPage extends AppCompatActivity {
         }
     }
 
-
     // BLE 스캔 콜백 정의
     private final ScanCallback leScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             BluetoothDevice device = result.getDevice();
+            int rssi = result.getRssi();
+
             if (ActivityCompat.checkSelfPermission(ClientMainPage.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -372,16 +373,26 @@ public class ClientMainPage extends AppCompatActivity {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            String deviceName = device.getName();
-            String deviceAddress = device.getAddress();
-            Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress);
-            if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
-                showFingerprintDialog(ClientMainPage.this);
-                stopBluetoothDiscovery();
-            }
-            if (!discoveredDevices.contains(deviceName + "\n" + deviceAddress)) {
-                discoveredDevices.add(deviceName + "\n" + deviceAddress);
 
+            // Define the RSSI threshold for proximity (e.g., -70 means strong signal, close proximity)
+            int rssiThreshold = -40;
+
+            // Check if the RSSI value is above the threshold (closer to zero is stronger)
+            if (rssi > rssiThreshold) {
+                String deviceName = device.getName();
+                String deviceAddress = device.getAddress();
+                Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress + " RSSI: " + rssi);
+
+                if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
+                    showFingerprintDialog(ClientMainPage.this);
+                    stopBluetoothDiscovery();
+                }
+
+                if (!discoveredDevices.contains(deviceName + "\n" + deviceAddress)) {
+                    discoveredDevices.add(deviceName + "\n" + deviceAddress);
+                }
+            } else {
+                Log.e(TAG, "Device " + device.getAddress() + " is out of range with RSSI: " + rssi);
             }
         }
 
