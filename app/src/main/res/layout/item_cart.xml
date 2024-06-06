@@ -23,50 +23,51 @@
 
     <!-- Item Details -->
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
         android:layout_weight="1"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
         <!-- Cart ID -->
         <TextView
             android:id="@+id/cart_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cart ID"
-            android:textSize="18sp"
-            android:textAlignment="center"
-            android:textColor="@android:color/black"
             android:fontFamily="sans-serif-medium"
             android:paddingTop="4dp"
-            android:paddingBottom="2dp" />
+            android:paddingBottom="2dp"
+            android:text="Cart ID"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
 
         <!-- Item ID -->
         <TextView
             android:id="@+id/item_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Item ID"
-            android:textSize="18sp"
-            android:textAlignment="center"
-            android:textColor="@android:color/black"
             android:fontFamily="sans-serif"
             android:paddingTop="2dp"
-            android:paddingBottom="2dp" />
+            android:paddingBottom="2dp"
+            android:text="Item ID"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
 
         <!-- Item Count -->
         <TextView
             android:id="@+id/item_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="수량"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:fontFamily="sans-serif"
             android:paddingTop="2dp"
-            android:paddingBottom="4dp" />
+            android:paddingBottom="4dp"
+            android:text="수량"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
     </LinearLayout>
 
 </LinearLayout>

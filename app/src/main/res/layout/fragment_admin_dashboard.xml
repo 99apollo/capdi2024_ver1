@@ -20,7 +20,7 @@
         android:textColor="@color/primaryTextColor"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:text="재고 현황 / 카트 유저 현황"
+        android:text="물품재고 및 카트 현황"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- RadioGroup to control Chip visibility -->
@@ -39,6 +39,7 @@
             style="@style/CustomRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
             android:text="재고 현황" />
 
         <RadioButton
@@ -46,6 +47,7 @@
             style="@style/CustomRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="카트 현황" />
     </RadioGroup>
 
