@@ -28,6 +28,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         this.itemList = itemList;
         notifyDataSetChanged();
     }
+    public void clearItems() {
+        this.itemList.clear();
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override

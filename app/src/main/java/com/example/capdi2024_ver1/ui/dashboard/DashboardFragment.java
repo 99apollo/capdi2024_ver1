@@ -3,7 +3,9 @@ package com.example.capdi2024_ver1.ui.dashboard;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +18,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.helper.widget.MotionEffect;
@@ -32,6 +36,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.capdi2024_ver1.BarcodeScannerActivity;
 import com.example.capdi2024_ver1.R;
 import com.example.capdi2024_ver1.SharedViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,7 +52,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.capdi2024_ver1.ClientMainPage;
+
 public class DashboardFragment extends Fragment {
 
     private RecyclerView recyclerView;
@@ -60,8 +65,8 @@ public class DashboardFragment extends Fragment {
     private Handler handler;
     private Runnable fetchRunnable;
     private List<CartItem> currentCartItems = new ArrayList<>(); // 기존 데이터 저장
+    private ActivityResultLauncher<Intent> qrCodeLauncher; // QR 코드 스캔 결과를 받을 ActivityResultLauncher
 
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -77,7 +82,19 @@ public class DashboardFragment extends Fragment {
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         Button disconnet_Button = requireActivity().findViewById(R.id.disconnect_button);
         disconnet_Button.setVisibility(View.VISIBLE);
-    // Log initial values
+
+        // QR 코드 스캔 결과를 받을 ActivityResultLauncher 초기화
+        qrCodeLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        handleQrResult(result.getData());
+                    } else {
+                        Toast.makeText(requireActivity(), "Cancelled", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        // ViewModel ID 로그
         if (sharedViewModel.getUserId().getValue() != null) {
             Log.d(MotionEffect.TAG, "Dashboard ViewModel ID: " + sharedViewModel.getUserId().getValue());
         } else {
@@ -95,6 +112,7 @@ public class DashboardFragment extends Fragment {
         } else {
             Log.d(MotionEffect.TAG, "Dashboard ViewModel Email: null");
         }
+
         sharedViewModel.getUserId().observe(getViewLifecycleOwner(), new Observer<String>() {  // `LiveData` 관찰
             @Override
             public void onChanged(String newUserId) {
@@ -104,7 +122,6 @@ public class DashboardFragment extends Fragment {
                 checkAndRequestCartId(userId);
             }
         });
-
 
         disconnet_Button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,12 +144,11 @@ public class DashboardFragment extends Fragment {
                 } else {
                     checkAndRequestCartId1(userId);
                 }
-
             }
         });
+
         return root;
     }
-
     private void startPeriodicFetching(String cartID) {
         if (handler == null) {
             handler = new Handler(Looper.getMainLooper()); // `Handler` 초기화
@@ -268,41 +284,29 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+
     private void requestCartId(String userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Enter Cart ID");
+        Intent intent = new Intent(requireActivity(), BarcodeScannerActivity.class);
+        qrCodeLauncher.launch(intent);
+    }
 
-        final EditText input = new EditText(getContext());
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String cartId = input.getText().toString();
-            cartListCheckRef.child(cartId).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DataSnapshot dataSnapshot = task.getResult();
-                    if (dataSnapshot.exists()) {
-                        // cart 사용자 존재시
-                        Toast.makeText(requireActivity(), "해당 카트는 사용자가 존재합니다.", Toast.LENGTH_LONG).show();
-
-                    } else {
-                        // cart 사용자 없을시
-                        cartListRef.child(userId).child("cart_id").setValue(cartId);
-                        cartListCheckRef.child(cartId).setValue(userId);
-                        Toast.makeText(requireActivity(), "카트 "+cartId+"번 연결", Toast.LENGTH_LONG).show();
-                        Button button1 = requireActivity().findViewById(R.id.disconnect_button);
-                        button1.setText("disconnect");
-                        loadCartItems(cartId);
-
-                    }
+    private void handleQrResult(Intent data) {
+        String cartId = data.getStringExtra("cart_id");
+        cartListCheckRef.child(cartId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot dataSnapshot = task.getResult();
+                if (dataSnapshot.exists()) {
+                    Toast.makeText(requireActivity(), "해당 카트는 사용자가 존재합니다.", Toast.LENGTH_LONG).show();
+                } else {
+                    cartListRef.child(userId).child("cart_id").setValue(cartId);
+                    cartListCheckRef.child(cartId).setValue(userId);
+                    Toast.makeText(requireActivity(), "카트 " + cartId + "번 연결", Toast.LENGTH_LONG).show();
+                    Button button1 = requireActivity().findViewById(R.id.disconnect_button);
+                    button1.setText("disconnect");
+                    loadCartItems(cartId);
                 }
-            });
+            }
         });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.cancel();
-        });
-
-        builder.show();
     }
 
     private void loadCartItems(String cartId) {

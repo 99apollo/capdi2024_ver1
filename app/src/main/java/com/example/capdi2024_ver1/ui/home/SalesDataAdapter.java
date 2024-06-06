@@ -27,6 +27,10 @@ public class SalesDataAdapter extends RecyclerView.Adapter<SalesDataAdapter.View
         this.salesList = salesList;
         notifyDataSetChanged();
     }
+    public void clearItems() {
+        this.salesList.clear();
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override

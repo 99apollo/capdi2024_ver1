@@ -32,7 +32,7 @@
         <!-- Cart ID -->
         <TextView
             android:id="@+id/cart_id"
-            android:layout_width="60dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cart ID"
             android:textSize="18sp"
@@ -45,7 +45,7 @@
         <!-- Item ID -->
         <TextView
             android:id="@+id/item_id"
-            android:layout_width="60dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Item ID"
             android:textSize="18sp"
@@ -58,7 +58,7 @@
         <!-- Item Count -->
         <TextView
             android:id="@+id/item_count"
-            android:layout_width="60dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="수량"
             android:textAlignment="center"

@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -30,7 +31,11 @@
             android:exported="false"
             android:label="@string/title_activity_client_main_page" />
         <activity android:name=".ui.home.SearchResultsActivity" />
-
+        <activity android:name=".BarcodeScannerActivity"
+            android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi"
+            tools:replace="screenOrientation"
+            />
         <activity
             android:name=".ClientPage"
             android:exported="false"

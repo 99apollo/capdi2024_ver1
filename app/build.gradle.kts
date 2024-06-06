@@ -54,5 +54,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth:21.0.1")
     implementation ("io.github.bootpay:android:4.4.3") //최신 버전 추천
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-
+    implementation ("com.journeyapps:zxing-android-embedded:3.6.0")
+    implementation ("com.google.zxing:core:3.4.1")
+    implementation ("com.google.mlkit:barcode-scanning:17.2.0")
 }
