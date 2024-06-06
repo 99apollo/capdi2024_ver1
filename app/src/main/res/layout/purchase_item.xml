@@ -9,7 +9,8 @@
         android:id="@+id/purchase_date_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Purchase Date"
+        android:text="구매일"
+        android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@+id/purchase_item_name_text_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -18,7 +19,8 @@
         android:id="@+id/purchase_item_name_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Item Name"
+        android:text="상품명"
+        android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@+id/purchase_price_text_view"
         app:layout_constraintStart_toEndOf="@+id/purchase_date_text_view"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +29,8 @@
         android:id="@+id/purchase_price_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Price"
+        android:text="가격"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/purchase_item_name_text_view"
         app:layout_constraintTop_toTopOf="parent" />

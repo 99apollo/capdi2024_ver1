@@ -37,48 +37,48 @@
                 android:id="@+id/list_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="물품 개수 : "
-                android:textSize="16sp"
                 android:padding="8dp"
+                android:text="담은 상품 수량 : "
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@android:color/black" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/list_count_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
                 android:padding="8dp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/list_count"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@android:color/black" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/Total_cost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="총 비용 :"
-                android:textSize="16sp"
                 android:padding="8dp"
+                android:text="총 금액 :"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/cost_input"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@android:color/black" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/cost_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
                 android:padding="8dp"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@android:color/black" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

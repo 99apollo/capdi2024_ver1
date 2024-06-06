@@ -5,4 +5,7 @@
     <color name="Orange">#D04E1B</color>
     <color name="primaryTextColor">#FF000000</color>
     <color name="chipBackground">#E0E0E0</color>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
 </resources>

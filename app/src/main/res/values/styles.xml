@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/radio_button_unchecked</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#C69886</item>
+        <item name="colorPrimaryDark">#C69886</item>
+        <item name="colorAccent">@color/Orange</item>
+    </style>
+
+    <!-- Custom CalendarView style -->
+    <style name="CustomCalendarView">
+        <item name="colorAccent">@color/Orange</item>
+        <item name="android:dateTextAppearance">@style/CalendarDateTextAppearance</item>
+    </style>
+
+    <!-- Custom date text appearance style -->
+    <style name="CalendarDateTextAppearance" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/Orange</item>
+    </style>
+</resources>

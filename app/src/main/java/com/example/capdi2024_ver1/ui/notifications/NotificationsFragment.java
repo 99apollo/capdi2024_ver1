@@ -114,7 +114,7 @@ public class NotificationsFragment extends Fragment {
                 List<Purchase> purchasesForToday = getPurchasesForDate(todayDate);
                 purchaseAdapter.setPurchases(purchasesForToday);
                 int totalAmount = calculateTotalAmount(purchasesForToday);
-                totalAmountTextView.setText("Total Amount: " + totalAmount);
+                totalAmountTextView.setText("구매 금액 : " + totalAmount);
             }
         });
 
