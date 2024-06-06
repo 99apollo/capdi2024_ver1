@@ -1,5 +1,7 @@
 package com.example.capdi2024_ver1.admin_ui.dashboard;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.capdi2024_ver1.R;
 import com.example.capdi2024_ver1.databinding.FragmentAdminDashboardBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,7 +50,9 @@ public class AdminDashboardFragment extends Fragment {
     private List<CartCheckItem> cartCheckItemList = new ArrayList<>();
     private CartCheckItemAdapter cartCheckItemAdapter;
     private DatabaseReference cartCheckListRef;
+    private DatabaseReference cartUserListRef;
     private TableLayout tableLayout;
+    private boolean checkEnd = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,6 +61,7 @@ public class AdminDashboardFragment extends Fragment {
         View root = binding.getRoot();
 
         cartCheckListRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
+        cartUserListRef=FirebaseDatabase.getInstance().getReference("users");
 
         // Get references to views
         RadioGroup radioGroup = binding.radioGroup;
@@ -170,12 +176,18 @@ public class AdminDashboardFragment extends Fragment {
                         }
                     }
 
-                    // Add only if it's a new userId
                     if (isNewUserId) {
-                        cartCheckItemList.add(new CartCheckItem(cartId, userId));
+                        cartUserListRef.child(userId).child("username").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                            @Override
+                            public void onSuccess(DataSnapshot dataSnapshot) {
+                                String tempID = (String) dataSnapshot.getValue();
+                                Log.e(TAG, "data snapshot : " + tempID);
+                                CartCheckItem temp = new CartCheckItem(cartId, tempID);
+                                addListItem(temp);
+                            }
+                        });
                     }
                 }
-                cartCheckItemAdapter.updateItemList(cartCheckItemList);
             }
 
             @Override
@@ -186,7 +198,14 @@ public class AdminDashboardFragment extends Fragment {
         });
     }
 
+    private void addListItem(CartCheckItem cartcheckitem) {
+        cartCheckItemList.add(cartcheckitem);
+        addItem(); // 어댑터 업데이트를 여기서 호출
+    }
 
+    private void addItem() {
+        cartCheckItemAdapter.updateItemList(cartCheckItemList);
+    }
 
 
     private void addDataToTableLayout(List<CartCheckItem> cartCheckItemList) {

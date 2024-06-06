@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -88,6 +89,15 @@ public class ClientMainPage extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_PERMISSION = 3;
     private static final int PERMISSION_REQUEST_CODE_S = 101;
     private static final int PERMISSION_REQUEST_CODE = 100;
+    private boolean doubleBackToExitPressedOnce = false;
+    private Handler handler1 = new Handler();
+    private Runnable resetDoubleBackToExitFlag = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
+
 
     private DatabaseReference cartListCheckRef;
     private DatabaseReference userPurchasesRef;
@@ -105,6 +115,7 @@ public class ClientMainPage extends AppCompatActivity {
         // Set up the Toolbar as ActionBar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         // Set up Navigation with AppBarConfiguration
         BottomNavigationView navView = binding.navView;
@@ -178,6 +189,20 @@ public class ClientMainPage extends AppCompatActivity {
 
         // 위치 권한을 확인하고 요청
         checkAndRequestLocationPermission();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (doubleBackToExitPressedOnce) {
+                    finishAffinity();
+                    return;
+                }
+
+                doubleBackToExitPressedOnce = true;
+                Toast.makeText(ClientMainPage.this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+                handler1.postDelayed(resetDoubleBackToExitFlag, 2000); // 2 seconds to reset the flag
+            }
+        });
     }
 
     private void checkAndRequestLocationPermission() {
@@ -199,6 +224,7 @@ public class ClientMainPage extends AppCompatActivity {
         super.onDestroy();
         // 액티비티가 종료될 때 Bluetooth 탐지 중지
         stopBluetoothDiscovery();
+        handler.removeCallbacks(resetDoubleBackToExitFlag);
     }
 
 
@@ -329,13 +355,14 @@ public class ClientMainPage extends AppCompatActivity {
         }
     }
 
-
     // BLE 스캔 콜백 정의
     private final ScanCallback leScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             BluetoothDevice device = result.getDevice();
+            int rssi = result.getRssi();
+
             if (ActivityCompat.checkSelfPermission(ClientMainPage.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -346,16 +373,26 @@ public class ClientMainPage extends AppCompatActivity {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            String deviceName = device.getName();
-            String deviceAddress = device.getAddress();
-            Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress);
-            if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
-                showFingerprintDialog(ClientMainPage.this);
-                stopBluetoothDiscovery();
-            }
-            if (!discoveredDevices.contains(deviceName + "\n" + deviceAddress)) {
-                discoveredDevices.add(deviceName + "\n" + deviceAddress);
 
+            // Define the RSSI threshold for proximity (e.g., -70 means strong signal, close proximity)
+            int rssiThreshold = -40;
+
+            // Check if the RSSI value is above the threshold (closer to zero is stronger)
+            if (rssi > rssiThreshold) {
+                String deviceName = device.getName();
+                String deviceAddress = device.getAddress();
+                Log.e(TAG, "name: " + deviceName + " address: " + deviceAddress + " RSSI: " + rssi);
+
+                if ("98:DA:60:02:B8:83".equals(deviceAddress)) {
+                    showFingerprintDialog(ClientMainPage.this);
+                    stopBluetoothDiscovery();
+                }
+
+                if (!discoveredDevices.contains(deviceName + "\n" + deviceAddress)) {
+                    discoveredDevices.add(deviceName + "\n" + deviceAddress);
+                }
+            } else {
+                Log.e(TAG, "Device " + device.getAddress() + " is out of range with RSSI: " + rssi);
             }
         }
 
@@ -408,72 +445,45 @@ public class ClientMainPage extends AppCompatActivity {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(this);
         }
-        // 요청할 URL
-        String url = "http://3.35.9.191/del3.php?cart_id=" + cart_ID;
 
         cartListRef = FirebaseDatabase.getInstance().getReference("cart_list");
         cartListCheckRef = FirebaseDatabase.getInstance().getReference("cart_check_list");
         Intent intent = getIntent();
         String userId = intent.getStringExtra("userId");
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
+        Log.e(TAG,"in remove function");
+        cartListRef.child(userId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                cartListCheckRef.child(cart_ID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onResponse(String response) {
-                        Log.e(TAG, "url response : " + response);
-                        Log.e(TAG, "user_ID_in response : " + userId);
-
-                        // Trim the response to remove any leading or trailing whitespace
-                        if (response.trim().equals("true")) {
-                            Log.e(TAG, "url response : " + response);
-                            Log.e(TAG, "user_ID_in response : " + userId);
-                            Log.e(TAG, "연결 카트 초기화? : ");
-
-                            cartListRef.child(userId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                    cartListCheckRef.child(cart_ID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            Log.e(TAG, "연결 카트 초기화? : ");
-                                            Toast.makeText(ClientMainPage.this, "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
-                                            Button disconnect = findViewById(R.id.disconnect_button);
-                                            disconnect.setText("connect");
-                                            // 현재 액티비티를 재시작
-                                            Intent intent = getIntent();
-                                            finish();
-                                            overridePendingTransition(0, 0); // 애니메이션 없이 전환
-                                            startActivity(intent);
-                                            overridePendingTransition(0, 0); // 애니메이션 없이 전환
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.e(TAG, "연결 카트 check 초기화 실패 ");
-                                            startBluetoothDiscoveryWithInterval();
-                                        }
-                                    });
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.e(TAG, "연결 카트 리스트 초기화 실패 ");
-                                    startBluetoothDiscoveryWithInterval();
-                                }
-                            });
-                        }
+                    public void onSuccess(Void unused) {
+                        Log.e(TAG, "연결 카트 초기화? : ");
+                        Toast.makeText(ClientMainPage.this, "연결된 카트가 해제되었습니다.", Toast.LENGTH_LONG).show();
+                        Button disconnect = findViewById(R.id.disconnect_button);
+                        disconnect.setText("connect");
+                        // 현재 액티비티를 재시작
+                        Intent intent = getIntent();
+                        finish();
+                        overridePendingTransition(0, 0); // 애니메이션 없이 전환
+                        startActivity(intent);
+                        overridePendingTransition(0, 0); // 애니메이션 없이 전환
                     }
-                },
-                new Response.ErrorListener() {
+                }).addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // 에러 처리
-                        Log.e(TAG, "Volley error: " + error.getMessage());
-                        stopBluetoothDiscovery();
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "연결 카트 check 초기화 실패 ");
+                        startBluetoothDiscoveryWithInterval();
                     }
                 });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "연결 카트 리스트 초기화 실패 ");
+                startBluetoothDiscoveryWithInterval();
+            }
+        });
 
-        requestQueue.add(stringRequest);
     }
 
     public void Payment(View v) {
@@ -560,6 +570,7 @@ public class ClientMainPage extends AppCompatActivity {
                                             public void onDone(String data) {
                                                 Log.d("done", data);
                                                 savePurchasesToFirebase(cartItems);
+                                                Log.e(TAG,"try to remove cart id+ Item");
                                                 removeItemAndCart();
                                             }
                                         }).requestPayment();
@@ -747,4 +758,5 @@ public class ClientMainPage extends AppCompatActivity {
                     '}';
         }
     }
+
 }

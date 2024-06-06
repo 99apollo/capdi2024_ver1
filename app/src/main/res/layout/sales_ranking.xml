@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:padding="8dp"
-    android:background="?attr/selectableItemBackground"
-    android:divider="?android:attr/dividerHorizontal"
     android:showDividers="middle">
 
     <TextView
@@ -13,8 +13,10 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
-        android:scaleType="centerCrop"
-        android:background="#E0E0E0" />
+        android:textSize="45dp"
+        android:textStyle="bold"
+        android:background="@color/white"
+        android:scaleType="centerCrop" />
 
 
     <ImageView
@@ -22,15 +24,17 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginEnd="8dp"
-        android:scaleType="centerCrop"
+        android:background="@color/white"
         android:contentDescription="Item Image"
-        android:background="#E0E0E0" />
+        android:scaleType="centerCrop" />
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/itemNamerank"
             android:layout_width="match_parent"

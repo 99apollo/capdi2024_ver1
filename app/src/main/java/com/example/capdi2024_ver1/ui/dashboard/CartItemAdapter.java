@@ -32,9 +32,9 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CartItem cartItem = cartItems.get(position);
-        holder.cartIdTextView.setText("price : " + cartItem.getPrice());
-        holder.itemIdTextView.setText("Item ID: " + cartItem.getItemId());
-        holder.itemCountTextView.setText("count: " + cartItem.getCount());
+        holder.cartIdTextView.setText("가격\t: " + cartItem.getPrice());
+        holder.itemIdTextView.setText("상품 명\t: " + cartItem.getItemId());
+        holder.itemCountTextView.setText("갯 수\t: " + cartItem.getCount());
 
         // getItemValue()가 이미지 파일 이름과 일치한다고 가정
         String itemValue = cartItem.getItemValue();
