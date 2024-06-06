@@ -27,6 +27,10 @@ public class SalesDataAdapter extends RecyclerView.Adapter<SalesDataAdapter.View
         this.salesList = salesList;
         notifyDataSetChanged();
     }
+    public void clearItems() {
+        this.salesList.clear();
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -74,7 +78,7 @@ public class SalesDataAdapter extends RecyclerView.Adapter<SalesDataAdapter.View
 
             itemNameRank.setText(salesData.getName());
             itemPriceRank.setText(salesData.getPrice() + "원");
-            salenumrank.setText(String.valueOf(salesData.getSalesPerDay()));
+            salenumrank.setText("판매량"+String.valueOf(salesData.getSalesPerDay()));
 
             // Add logging
             Log.d("SalesDataAdapter", "Name: " + salesData.getName() + ", Price: " + salesData.getPrice() + ", SalesPerDay: " + salesData.getSalesPerDay());

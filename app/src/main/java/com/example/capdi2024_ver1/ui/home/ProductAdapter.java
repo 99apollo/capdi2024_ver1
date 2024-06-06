@@ -1,5 +1,6 @@
 package com.example.capdi2024_ver1.ui.home;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
     public void setItems(List<ItemData> itemList) {
         this.itemList = itemList;
+        notifyDataSetChanged();
+    }
+    public void clearItems() {
+        this.itemList.clear();
         notifyDataSetChanged();
     }
 
@@ -62,10 +67,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             itemImageView = itemView.findViewById(R.id.item_Image);
         }
 
+        @SuppressLint("SetTextI18n")
         void bind(ItemData item) {
             itemNameTextView.setText(item.getName());
-            itemPriceTextView.setText(String.valueOf(item.getPrice()));
-            itemLocationTextView.setText(item.getLocation());
+            itemPriceTextView.setText(String.valueOf(item.getPrice())+"원");
+            itemLocationTextView.setText("위치" + item.getLocation());
 
             // 이미지 리소스를 설정합니다.
             int resId = itemView.getContext().getResources().getIdentifier(item.getImageResource(), "drawable", itemView.getContext().getPackageName());
