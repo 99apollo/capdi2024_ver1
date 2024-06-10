@@ -53,34 +53,41 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-
                 <Button
                     android:id="@+id/button_category1"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="신선식품" />
+                    android:background="@drawable/button_background"
+                    android:text="신선식품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category2"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="냉동식품" />
+                    android:background="@drawable/button_background"
+                    android:text="유제품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category3"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="가공식품" />
+                    android:background="@drawable/button_background"
+                    android:text="가공식품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category4"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="기타" />
+                    android:background="@drawable/button_background"
+                    android:text="음료"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <!-- Add more buttons as needed -->
             </LinearLayout>
@@ -114,46 +121,55 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-
                 <Button
                     android:id="@+id/button_category00"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="전체제품" />
+                    android:background="@drawable/button_background"
+                    android:text="전체제품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category10"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="신선식품" />
+                    android:background="@drawable/button_background"
+                    android:text="신선식품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category20"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="냉동식품" />
+                    android:background="@drawable/button_background"
+                    android:text="유제품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category30"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="가공식품" />
+                    android:background="@drawable/button_background"
+                    android:text="가공식품"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <Button
                     android:id="@+id/button_category40"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
                     android:layout_height="40dp"
-                    android:background="#FFC107"
-                    android:text="기타" />
+                    android:background="@drawable/button_background"
+                    android:text="음료"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp" />
 
                 <!-- Add more buttons as needed -->
             </LinearLayout>

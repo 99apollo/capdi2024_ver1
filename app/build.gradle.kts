@@ -58,4 +58,5 @@ dependencies {
     implementation ("com.journeyapps:zxing-android-embedded:3.6.0")
     implementation ("com.google.zxing:core:3.4.1")
     implementation ("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

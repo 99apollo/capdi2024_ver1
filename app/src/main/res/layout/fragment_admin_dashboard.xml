@@ -74,7 +74,7 @@
             android:id="@+id/chip2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="냉동식품"
+            android:text="유제품"
             app:chipBackgroundColor="@color/Orange"
             android:textColor="@color/white" />
 
@@ -90,7 +90,7 @@
             android:id="@+id/chip4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="기타"
+            android:text="음료"
             app:chipBackgroundColor="@color/Orange"
             android:textColor="@color/white" />
     </com.google.android.material.chip.ChipGroup>

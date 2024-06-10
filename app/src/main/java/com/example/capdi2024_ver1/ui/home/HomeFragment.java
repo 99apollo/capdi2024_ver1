@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
         });
 
         buttonCategory2.setOnClickListener(v -> {
-            fetchItemDataByCategory("냉동식품");
+            fetchItemDataByCategory("유제품");
             toggleRecyclerViewProductsVisibility();
         });
 
@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
         });
 
         buttonCategory4.setOnClickListener(v -> {
-            fetchItemDataByCategory("기타");
+            fetchItemDataByCategory("음료");
             toggleRecyclerViewProductsVisibility();
         });
 
@@ -107,7 +107,7 @@ public class HomeFragment extends Fragment {
         });
 
         buttonCategory20.setOnClickListener(v -> {
-            fetchSalesData("냉동식품");
+            fetchSalesData("유제품");
             toggleRecyclerViewSalesVisibility();
         });
 
@@ -117,7 +117,7 @@ public class HomeFragment extends Fragment {
         });
 
         buttonCategory40.setOnClickListener(v -> {
-            fetchSalesData("기타");
+            fetchSalesData("음료");
             toggleRecyclerViewSalesVisibility();
         });
 
@@ -250,7 +250,7 @@ public class HomeFragment extends Fragment {
                     public void onResponse(String response) {
                         Log.d("HomeFragment", "Server Response: " + response);
                         salesDataList = parseSalesDataJson(response);
-                          updateRecyclerViewWithSalesData(salesDataList);
+                        updateRecyclerViewWithSalesData(salesDataList);
                     }
                 },
                 new Response.ErrorListener() {

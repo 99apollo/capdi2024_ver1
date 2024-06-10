@@ -95,9 +95,9 @@ public class AdminDashboardFragment extends Fragment {
 
         // Set onClickListeners for each chip
         binding.chip1.setOnClickListener(v -> filterItemsByCategory("신선식품"));
-        binding.chip2.setOnClickListener(v -> filterItemsByCategory("냉동식품"));
+        binding.chip2.setOnClickListener(v -> filterItemsByCategory("유제품"));
         binding.chip3.setOnClickListener(v -> filterItemsByCategory("가공식품"));
-        binding.chip4.setOnClickListener(v -> filterItemsByCategory("기타"));
+        binding.chip4.setOnClickListener(v -> filterItemsByCategory("음료"));
 
         return root;
     }
