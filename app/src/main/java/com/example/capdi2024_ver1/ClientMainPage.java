@@ -265,7 +265,7 @@ public class ClientMainPage extends AppCompatActivity {
             @Override
             public void run() {
                 doBluetoothDiscovery();
-                handler.postDelayed(this, 12000); // 4초마다 실행 (2초 스캔 + 2초 대기)
+                handler.postDelayed(this, 12000); // 초12마다 실행 (2초 스캔 + 2초 대기)
             }
         };
         handler.post(bluetoothDiscoveryRunnable);
@@ -350,7 +350,7 @@ public class ClientMainPage extends AppCompatActivity {
                     }
                     bluetoothLeScanner.stopScan(leScanCallback);
                 }
-            }, 4000);
+            }, 5000);
             bluetoothLeScanner.startScan(leScanCallback);
         }
     }
@@ -462,6 +462,7 @@ public class ClientMainPage extends AppCompatActivity {
                         Button disconnect = findViewById(R.id.disconnect_button);
                         disconnect.setText("connect");
                         // 현재 액티비티를 재시작
+                        sendHttpRequestToDel3Php();
                         Intent intent = getIntent();
                         finish();
                         overridePendingTransition(0, 0); // 애니메이션 없이 전환
@@ -486,6 +487,29 @@ public class ClientMainPage extends AppCompatActivity {
 
     }
 
+    private void sendHttpRequestToDel3Php() {
+        String url = "http://3.35.9.191/del3.php?cart_id="+cart_ID;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 요청이 성공적으로 완료된 경우 실행할 코드
+                        Log.e(TAG, "HTTP 요청 성공: " + response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 요청이 실패한 경우 실행할 코드
+                        Log.e(TAG, "HTTP 요청 실패: " + error.getMessage());
+                    }
+                }
+        );
+
+        // 요청을 RequestQueue에 추가
+        requestQueue.add(stringRequest);
+    }
     public void Payment(View v) {
         stopBluetoothDiscovery();
         BootUser user = new BootUser().setPhone("010-1234-5678"); // 구매자 정보
