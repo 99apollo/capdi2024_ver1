@@ -1,19 +1,22 @@
 package com.example.capdi2024_ver1;
+
 public class Purchase {
     private String date;
     private String itemID;
     private String itemName;
     private int price;
+    private int quantity; // 추가된 필드
 
     // 생성자, getter 및 setter
 
     public Purchase() {}
 
-    public Purchase(String date, String itemID, String itemName, int price) {
+    public Purchase(String date, String itemID, String itemName, int price, int quantity) {
         this.date = date;
         this.itemID = itemID;
         this.itemName = itemName;
         this.price = price;
+        this.quantity = quantity;
     }
 
     public String getDate() {
@@ -48,6 +51,14 @@ public class Purchase {
         this.price = price;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
     public String toString() {
         return "Purchase{" +
@@ -55,6 +66,7 @@ public class Purchase {
                 ", itemID='" + itemID + '\'' +
                 ", itemName='" + itemName + '\'' +
                 ", price=" + price +
+                ", quantity=" + quantity +
                 '}';
     }
 }

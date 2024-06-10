@@ -1,4 +1,5 @@
 package com.example.capdi2024_ver1;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
         holder.purchaseDateTextView.setText(purchase.getDate());
         holder.purchaseItemNameTextView.setText(purchase.getItemName());
         holder.purchasePriceTextView.setText(String.valueOf(purchase.getPrice()));
+        holder.purchaseQuantityTextView.setText(String.valueOf(purchase.getQuantity())); // 수량 표시
     }
 
     @Override
@@ -43,12 +45,14 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
         TextView purchaseDateTextView;
         TextView purchaseItemNameTextView;
         TextView purchasePriceTextView;
+        TextView purchaseQuantityTextView; // 수량 표시 텍스트뷰
 
         public PurchaseViewHolder(@NonNull View itemView) {
             super(itemView);
             purchaseDateTextView = itemView.findViewById(R.id.purchase_date_text_view);
             purchaseItemNameTextView = itemView.findViewById(R.id.purchase_item_name_text_view);
             purchasePriceTextView = itemView.findViewById(R.id.purchase_price_text_view);
+            purchaseQuantityTextView = itemView.findViewById(R.id.purchase_quantity_text_view); // 추가
         }
     }
 

@@ -24,7 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationsFragment extends Fragment {
 
@@ -112,7 +114,7 @@ public class NotificationsFragment extends Fragment {
                 // Show purchases for today's date
                 String todayDate = getTodayDate();
                 List<Purchase> purchasesForToday = getPurchasesForDate(todayDate);
-                purchaseAdapter.setPurchases(purchasesForToday);
+                purchaseAdapter.setPurchases(aggregatePurchases(purchasesForToday)); // 수정된 부분
                 int totalAmount = calculateTotalAmount(purchasesForToday);
                 totalAmountTextView.setText("구매 금액 : " + totalAmount);
             }
@@ -122,7 +124,7 @@ public class NotificationsFragment extends Fragment {
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             String selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
             List<Purchase> purchasesForSelectedDate = getPurchasesForDate(selectedDate);
-            purchaseAdapter.setPurchases(purchasesForSelectedDate);
+            purchaseAdapter.setPurchases(aggregatePurchases(purchasesForSelectedDate)); // 수정된 부분
             int totalAmount = calculateTotalAmount(purchasesForSelectedDate);
             totalAmountTextView.setText("Total Amount: " + totalAmount);
         });
@@ -141,10 +143,25 @@ public class NotificationsFragment extends Fragment {
         return purchasesForDate;
     }
 
+    private List<Purchase> aggregatePurchases(List<Purchase> purchases) {
+        Map<String, Purchase> aggregated = new HashMap<>();
+        for (Purchase purchase : purchases) {
+            String key = purchase.getItemName() + purchase.getPrice();
+            if (aggregated.containsKey(key)) {
+                Purchase existing = aggregated.get(key);
+                existing.setQuantity(existing.getQuantity() + 1);
+            } else {
+                purchase.setQuantity(1);
+                aggregated.put(key, purchase);
+            }
+        }
+        return new ArrayList<>(aggregated.values());
+    }
+
     private int calculateTotalAmount(List<Purchase> purchases) {
         int totalAmount = 0;
         for (Purchase purchase : purchases) {
-            totalAmount += purchase.getPrice();
+            totalAmount += purchase.getPrice() * purchase.getQuantity();
         }
         return totalAmount;
     }

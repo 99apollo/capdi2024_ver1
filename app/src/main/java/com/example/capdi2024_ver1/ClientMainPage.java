@@ -596,7 +596,7 @@ public class ClientMainPage extends AppCompatActivity {
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         for (CartItem cartItem : cartItems) {
             String purchaseId = userPurchasesRef.push().getKey(); // 새로운 키 생성
-            Purchase purchase = new Purchase(currentDate, cartItem.getItemValue(), cartItem.getName(), cartItem.getPrice());
+            Purchase purchase = new Purchase(currentDate, cartItem.getItemValue(), cartItem.getName(), cartItem.getPrice(), cartItem.getCount()); // count 추가
             if (purchaseId != null) {
                 userPurchasesRef.child(purchaseId).setValue(purchase).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

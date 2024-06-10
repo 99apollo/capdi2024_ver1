@@ -20,11 +20,11 @@ public class PurchaseActivity extends AppCompatActivity {
     }
 
     // 구매 내역 추가 메서드
-    public void addPurchase(Context context, String userId, String itemName, int price, String date) {
+    public void addPurchase(Context context, String userId, String itemName, int price, String date, int quantity) {
         String purchaseId = databaseReference.child(userId).child("purchases").push().getKey();
 
         if (purchaseId != null) {
-            Purchase purchase = new Purchase(date, purchaseId, itemName, price);
+            Purchase purchase = new Purchase(date, purchaseId, itemName, price, quantity);
             databaseReference.child(userId).child("purchases").child(purchaseId).setValue(purchase)
                     .addOnSuccessListener(aVoid -> {
                         // 구매 내역 추가 성공 시 처리
@@ -38,7 +38,6 @@ public class PurchaseActivity extends AppCompatActivity {
     }
 }
 
-
 // 예시: 사용자가 구매를 완료한 후
 //PurchaseActivity purchaseActivity = new PurchaseActivity();
-//purchaseActivity.addPurchase(this, userId, "itemName1", 100, "2023-05-15");
+//purchaseActivity.addPurchase(this, userId, "itemName1", 100, "2023-05-15", 2);
