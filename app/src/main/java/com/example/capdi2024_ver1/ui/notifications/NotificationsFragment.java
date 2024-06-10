@@ -146,13 +146,12 @@ public class NotificationsFragment extends Fragment {
     private List<Purchase> aggregatePurchases(List<Purchase> purchases) {
         Map<String, Purchase> aggregated = new HashMap<>();
         for (Purchase purchase : purchases) {
-            String key = purchase.getItemName() + purchase.getPrice();
+            String key = purchase.getItemName() + "_" + purchase.getPrice(); // 아이템 이름과 가격으로 키 생성
             if (aggregated.containsKey(key)) {
                 Purchase existing = aggregated.get(key);
-                existing.setQuantity(existing.getQuantity() + 1);
+                existing.setQuantity(existing.getQuantity() + purchase.getQuantity()); // 기존 수량에 현재 수량 더하기
             } else {
-                purchase.setQuantity(1);
-                aggregated.put(key, purchase);
+                aggregated.put(key, new Purchase(purchase.getDate(), purchase.getItemID(), purchase.getItemName(), purchase.getPrice(), purchase.getQuantity()));
             }
         }
         return new ArrayList<>(aggregated.values());
