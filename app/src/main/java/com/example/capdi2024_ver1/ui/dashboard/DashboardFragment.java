@@ -160,7 +160,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void run() {
                 sendHttpRequest(cartID); // HTTP 요청 수행
-                handler.postDelayed(this, 7000); // 10초 후에 다시 실행
+                handler.postDelayed(this, 1000); // 10초 후에 다시 실행
                 Log.e(TAG, "test" + cartID);
             }
         };
@@ -396,12 +396,14 @@ public class DashboardFragment extends Fragment {
     private void updateCartItems(List<CartItem> newCartItems) {
         List<CartItem> itemsToAdd = new ArrayList<>();
         List<CartItem> itemsToRemove = new ArrayList<>();
-        if(newCartItems.isEmpty()){
+
+        if (newCartItems.isEmpty()) {
             TextView listCount = requireActivity().findViewById(R.id.list_count_input);
             TextView totalCostInput = requireActivity().findViewById(R.id.cost_input);
             totalCostInput.setText("0");
-            listCount.setText("0"); // 문자열로 변환
+            listCount.setText("0");
         }
+
         // 기존 데이터를 새 데이터와 비교하여 없는 경우에만 제거
         for (CartItem currentItem : currentCartItems) {
             boolean exists = false;
@@ -416,12 +418,16 @@ public class DashboardFragment extends Fragment {
             }
         }
 
-        // 새 데이터를 기존 데이터와 비교하여 없는 경우에만 추가
+        // 새 데이터를 기존 데이터와 비교하여 없는 경우에만 추가하고, 있는 경우 count 업데이트
         for (CartItem newItem : newCartItems) {
             boolean exists = false;
             for (CartItem currentItem : currentCartItems) {
                 if (currentItem.getItemId().equals(newItem.getItemId())) {
                     exists = true;
+                    // count가 다를 경우 업데이트
+                    if (currentItem.getCount() != newItem.getCount()) {
+                        currentItem.setCount(newItem.getCount());
+                    }
                     break;
                 }
             }
@@ -444,6 +450,7 @@ public class DashboardFragment extends Fragment {
             adapter.notifyDataSetChanged();
         }
     }
+
 
     @Override
     public void onPause() {

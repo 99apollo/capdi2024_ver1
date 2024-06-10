@@ -28,4 +28,8 @@ public class CartItem {
     }
     public String getCount(){return count;}
     public String getPrice(){return price;}
+
+    public void setCount(String count) {
+        this.count=count;
+    }
 }
