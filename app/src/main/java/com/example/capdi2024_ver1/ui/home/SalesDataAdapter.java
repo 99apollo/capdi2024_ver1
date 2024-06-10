@@ -78,7 +78,7 @@ public class SalesDataAdapter extends RecyclerView.Adapter<SalesDataAdapter.View
 
             itemNameRank.setText(salesData.getName());
             itemPriceRank.setText(salesData.getPrice() + "원");
-            salenumrank.setText("판매량"+String.valueOf(salesData.getSalesPerDay()));
+            salenumrank.setText("판매량: "+String.valueOf(salesData.getSalesPerDay())+"개");
 
             // Add logging
             Log.d("SalesDataAdapter", "Name: " + salesData.getName() + ", Price: " + salesData.getPrice() + ", SalesPerDay: " + salesData.getSalesPerDay());

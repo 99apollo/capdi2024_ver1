@@ -71,7 +71,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         void bind(ItemData item) {
             itemNameTextView.setText(item.getName());
             itemPriceTextView.setText(String.valueOf(item.getPrice())+"원");
-            itemLocationTextView.setText("위치" + item.getLocation());
+            itemLocationTextView.setText("위치 :" + item.getLocation());
 
             // 이미지 리소스를 설정합니다.
             int resId = itemView.getContext().getResources().getIdentifier(item.getImageResource(), "drawable", itemView.getContext().getPackageName());

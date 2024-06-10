@@ -40,7 +40,7 @@
             android:layout_margin="8dp"
             android:text="카테고리"
             android:textAlignment="center"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
 
         <!-- Horizontal ScrollView for category buttons -->
         <HorizontalScrollView
